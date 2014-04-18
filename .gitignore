@@ -19,3 +19,9 @@
 *.exe
 *.out
 *.app
+
+# Temp build directory
+_builds/*
+
+# Temp build script
+build.sh
