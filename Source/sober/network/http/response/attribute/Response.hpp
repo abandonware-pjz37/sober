@@ -6,6 +6,7 @@
 
 #include <sober/network/http/response/attribute/StatusLine.hpp>
 #include <sober/network/http/response/attribute/ContentLength.hpp>
+#include <sober/network/http/response/attribute/TransferEncoding.hpp>
 
 namespace sober {
 namespace network {
@@ -16,6 +17,7 @@ namespace attribute {
 struct Response {
   StatusLine status_line;
   ContentLength content_length;
+  TransferEncoding transfer_encoding;
   std::string message_body;
 };
 
@@ -28,7 +30,12 @@ struct Response {
 BOOST_FUSION_ADAPT_STRUCT(
     sober::network::http::response::attribute::Response,
     (sober::network::http::response::attribute::StatusLine, status_line)
-    (sober::network::http::response::attribute::ContentLength, content_length)
+    (sober::network::http::response::attribute::ContentLength,
+        content_length
+    )
+    (sober::network::http::response::attribute::TransferEncoding,
+        transfer_encoding
+    )
     (std::string, message_body)
 )
 
