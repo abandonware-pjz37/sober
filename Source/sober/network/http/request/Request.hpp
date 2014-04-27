@@ -13,12 +13,19 @@ namespace request {
 
 class Request {
  public:
-  static Request make_get(const std::string& host_name);
+  static Request make_get(
+      const std::string& host_name,
+      const std::string& uri
+  );
 
   const std::string& str() const noexcept;
 
  private:
-  static Request make_1_1(const char* method, const std::string& host_name);
+  static Request make_1_1(
+      const char* method,
+      const std::string& host_name,
+      const std::string& uri
+  );
 
   std::string request_;
 };
