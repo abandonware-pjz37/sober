@@ -18,3 +18,4 @@ sugar_files(
 
 sugar_include(attribute)
 sugar_include(grammar)
+sugar_include(unittest)
