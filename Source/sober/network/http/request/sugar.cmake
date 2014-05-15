@@ -11,6 +11,11 @@ include(sugar_files)
 
 sugar_files(
     SOBER_SOURCES
+    Method.cpp
+    Method.fpp
+    Method.hpp
     Request.cpp
+    Request.fpp
     Request.hpp
+    Request.ipp
 )
