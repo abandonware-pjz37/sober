@@ -82,6 +82,31 @@ TEST_F(Parser, chunked_simple) {
   ASSERT_STREQ("ABC", body.c_str());
 }
 
+TEST_F(Parser, chunked_forbidden) {
+  std::string message(
+      "HTTP/1.1 403 Forbidden\r\n"
+      "Server: cloudflare-nginx\r\n"
+      "Date: Thu, 15 May 2014 07:02:54 GMT\r\n"
+      "Content-Type: text/html; charset=UTF-8\r\n"
+      "Transfer-Encoding: chunked\r\n"
+      "Connection: keep-alive\r\n"
+      "Set-Cookie: __cfduid=; expires=Mon, 23-Dec-2019 23:50:00 GMT;"
+          " path=/; HttpOnly\r\n"
+      "Cache-Control: max-age=15\r\n"
+      "Expires: Thu, 15 May 2014 07:03:09 GMT\r\n"
+      "CF-RAY: -AMS\r\n"
+      "\r\n"
+      "0\r\n"
+      "\r\n"
+  );
+
+  std::string body;
+  ASSERT_THROW(
+      response::Parser::parse(message.begin(), message.end(), body),
+      std::runtime_error
+  );
+}
+
 TEST_F(Parser, chunked_real) {
   std::string message(
       "HTTP/1.1 200 OK\r\n"
