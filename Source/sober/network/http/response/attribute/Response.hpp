@@ -39,7 +39,7 @@ BOOST_FUSION_ADAPT_STRUCT(
     (sober::network::http::response::attribute::TransferEncoding,
         transfer_encoding
     )
-    (std::string, message_body)
+    (std::string&, message_body)
 )
 
 #endif // SOBER_NETWORK_HTTP_RESPONSE_ATTRIBUTE_RESPONSE_HPP_
