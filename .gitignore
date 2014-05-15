@@ -25,3 +25,10 @@ _builds/*
 
 # Temp build script
 build.sh
+
+# Temp macosx
+*/.DS_Store
+*/*/.DS_Store
+*/*/*/.DS_Store
+*/*/*/*/.DS_Store
+*/*/*/*/*/.DS_Store
