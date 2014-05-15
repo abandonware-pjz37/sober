@@ -2,10 +2,10 @@
 #define SOBER_NETWORK_HTTP_RESPONSE_PARSER_IPP_
 
 #include <sober/network/http/response/Parser.hpp>
-#include <sober/network/http/response/grammar/Response.hpp>
-#include <sober/network/http/response/attribute/Response.hpp>
 
-#include <boost/spirit/home/qi/action/action.hpp>
+#include <boost/spirit/home/qi/action/action.hpp> // spirit::qi::parse
+#include <sober/network/http/response/attribute/Response.hpp>
+#include <sober/network/http/response/grammar/Response.hpp>
 
 namespace sober {
 namespace network {
@@ -15,7 +15,9 @@ namespace response {
 template <class Iterator>
 bool Parser::parse(Iterator begin, Iterator end, std::string& body) {
   grammar::Response<Iterator> grammar;
-  attribute::Response attr;
+
+  body.clear();
+  attribute::Response attr(body);
 
   const bool result = boost::spirit::qi::parse(begin, end, grammar, attr);
   if (!result) {
@@ -26,7 +28,6 @@ bool Parser::parse(Iterator begin, Iterator end, std::string& body) {
     throw std::runtime_error("Response Status-Code is not OK");
   }
 
-  body = attr.message_body;
   return true;
 }
 

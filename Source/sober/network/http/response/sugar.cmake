@@ -12,8 +12,11 @@ include(sugar_include)
 
 sugar_files(
     SOBER_SOURCES
-    Parser.ipp
     Parser.hpp
+    Parser.ipp
+    Response.cpp
+    Response.hpp
+    Response.ipp
 )
 
 sugar_include(attribute)

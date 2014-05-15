@@ -15,10 +15,13 @@ namespace response {
 namespace attribute {
 
 struct Response {
+  Response(std::string& body): message_body(body) {
+  }
+
   StatusLine status_line;
   ContentLength content_length;
   TransferEncoding transfer_encoding;
-  std::string message_body;
+  std::string& message_body;
 };
 
 } // namespace attribute
