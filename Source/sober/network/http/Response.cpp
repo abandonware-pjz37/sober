@@ -1,7 +1,7 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <sober/network/http/response/Response.hpp>
+#include <sober/network/http/Response.hpp>
 
 #include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
 #include <sober/log/Severity.hpp>
@@ -10,7 +10,6 @@
 namespace sober {
 namespace network {
 namespace http {
-namespace response {
 
 Response::Response(const Stream& stream):
     stream_(stream),
@@ -102,7 +101,6 @@ std::size_t Response::completion_condition(
   }
 }
 
-} // namespace response
 } // namespace http
 } // namespace network
 } // namespace sober

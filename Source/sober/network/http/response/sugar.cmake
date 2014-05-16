@@ -14,9 +14,6 @@ sugar_files(
     SOBER_SOURCES
     Parser.hpp
     Parser.ipp
-    Response.cpp
-    Response.hpp
-    Response.ipp
 )
 
 sugar_include(attribute)

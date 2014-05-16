@@ -19,6 +19,9 @@ sugar_files(
     ConnectManager.cpp
     ConnectManager.hpp
     ConnectManager.ipp
+    Response.cpp
+    Response.hpp
+    Response.ipp
     Statistic.cpp
     Statistic.hpp
     Stream.cpp
