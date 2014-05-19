@@ -14,7 +14,7 @@ sugar_files(
     ChunkSize.hpp
     ContentLength.hpp
     ReasonPhrase.hpp
-    Response.hpp
+    StatusCode.cpp
     StatusCode.hpp
     StatusLine.hpp
     TEXT.hpp

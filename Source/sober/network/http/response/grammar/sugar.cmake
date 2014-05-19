@@ -20,9 +20,7 @@ sugar_files(
     HTTPVersion.hpp
     LF.hpp
     LWS.hpp
-    MessageBody.hpp
     ReasonPhrase.hpp
-    Response.hpp
     SP.hpp
     StatusCode.hpp
     StatusLine.hpp
