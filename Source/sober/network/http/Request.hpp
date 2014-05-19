@@ -1,10 +1,10 @@
-#ifndef SOBER_NETWORK_HTTP_REQUEST_REQUEST_HPP_
-#define SOBER_NETWORK_HTTP_REQUEST_REQUEST_HPP_
+#ifndef SOBER_NETWORK_HTTP_REQUEST_HPP_
+#define SOBER_NETWORK_HTTP_REQUEST_HPP_
 
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <sober/network/http/request/Request.fpp>
+#include <sober/network/http/Request.fpp>
 
 #include <boost/asio/ip/tcp.hpp> // socket
 #include <boost/asio/streambuf.hpp>
@@ -16,7 +16,6 @@
 namespace sober {
 namespace network {
 namespace http {
-namespace request {
 
 /**
   * @brief HTTP request class
@@ -62,9 +61,8 @@ class Request {
   std::string query_;
 };
 
-} // namespace request
 } // namespace http
 } // namespace network
 } // namespace sober
 
-#endif // SOBER_NETWORK_HTTP_REQUEST_REQUEST_HPP_
+#endif // SOBER_NETWORK_HTTP_REQUEST_HPP_

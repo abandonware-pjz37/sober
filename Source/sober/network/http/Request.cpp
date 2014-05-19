@@ -1,7 +1,7 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <sober/network/http/request/Request.hpp>
+#include <sober/network/http/Request.hpp>
 
 #include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
 #include <network/uri/uri.hpp> // uri::encode_query
@@ -12,7 +12,6 @@
 namespace sober {
 namespace network {
 namespace http {
-namespace request {
 
 Request::Request(const Stream& stream):
     stream_(stream),
@@ -113,7 +112,6 @@ void Request::fill_streambuf() {
   BOOST_LOG(log_debug_) << std::endl << std::string(begin, begin + size);
 }
 
-} // namespace request
 } // namespace http
 } // namespace network
 } // namespace sober
