@@ -14,8 +14,4 @@ sugar_files(
     Method.cpp
     Method.fpp
     Method.hpp
-    Request.cpp
-    Request.fpp
-    Request.hpp
-    Request.ipp
 )

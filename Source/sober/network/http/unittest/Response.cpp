@@ -1,20 +1,29 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <gtest/gtest.h> // TEST_F
+#include <sober/network/http/unittest/Response.fpp>
 
-#include <sober/network/http/response/Parser.ipp>
+#include <gtest/gtest.h> // TEST_F
+#include <sober/network/http/Response.hpp>
+#include <sober/network/http/sink/String.hpp>
+#include <sober/utils/Test.hpp>
 
 namespace sober {
 namespace network {
 namespace http {
-namespace response {
 namespace unittest {
 
-class Parser : public ::testing::Test {
+class Response : public utils::Test {
+ public:
+  using Pointer = std::unique_ptr<http::Response>;
+
+  // Workaround for private constructor
+  Pointer make_response(const std::string& message, http::Sink& sink) {
+    return Pointer(new http::Response(message, sink));
+  }
 };
 
-TEST_F(Parser, content_length_good) {
+TEST_F(Response, content_length_good) {
   std::string message(
       "HTTP/1.1 200 OK\r\n"
       "Date: Sun, 27 Apr 2014 19:02:53 GMT\r\n"
@@ -25,16 +34,20 @@ TEST_F(Parser, content_length_good) {
       "Hello, body!"
   );
 
-  std::string body;
-  const bool result = response::Parser::parse(
-      message.begin(), message.end(), body
-  );
+  sink::String sink;
 
-  ASSERT_EQ(result, true);
-  ASSERT_STREQ("Hello, body!", body.c_str());
+  ASSERT_FALSE(sink.ready());
+  auto response = make_response(message, sink);
+  ASSERT_TRUE(sink.ready());
+
+  ASSERT_EQ(
+      response->header().status_line.status_code,
+      response::attribute::StatusCode::OK
+  );
+  ASSERT_STREQ("Hello, body!", sink.body().c_str());
 }
 
-TEST_F(Parser, content_length_bad) {
+TEST_F(Response, content_length_bad) {
   std::string message(
       "HTTP/1.1 200 OK\r\n"
       "Date: Sun, 27 Apr 2014 19:02:53 GMT\r\n"
@@ -45,15 +58,14 @@ TEST_F(Parser, content_length_bad) {
       "Hello, body!"
   );
 
-  std::string body;
-  const bool result = response::Parser::parse(
-      message.begin(), message.end(), body
-  );
+  sink::String sink;
 
-  ASSERT_EQ(result, false);
+  ASSERT_FALSE(sink.ready());
+  ASSERT_THROW(make_response(message, sink), std::runtime_error);
+  ASSERT_FALSE(sink.ready());
 }
 
-TEST_F(Parser, chunked_simple) {
+TEST_F(Response, chunked_simple) {
   std::string message(
       "HTTP/1.1 200 OK\r\n"
       "Server: nginx\r\n"
@@ -73,16 +85,20 @@ TEST_F(Parser, chunked_simple) {
       "\r\n"
   );
 
-  std::string body;
-  const bool result = response::Parser::parse(
-      message.begin(), message.end(), body
-  );
+  sink::String sink;
 
-  ASSERT_EQ(result, true);
-  ASSERT_STREQ("ABC", body.c_str());
+  ASSERT_FALSE(sink.ready());
+  auto response = make_response(message, sink);
+  ASSERT_TRUE(sink.ready());
+
+  ASSERT_STREQ("ABC", sink.body().c_str());
+  ASSERT_EQ(
+      response->header().status_line.status_code,
+      response::attribute::StatusCode::OK
+  );
 }
 
-TEST_F(Parser, chunked_forbidden) {
+TEST_F(Response, chunked_forbidden) {
   std::string message(
       "HTTP/1.1 403 Forbidden\r\n"
       "Server: cloudflare-nginx\r\n"
@@ -100,14 +116,20 @@ TEST_F(Parser, chunked_forbidden) {
       "\r\n"
   );
 
-  std::string body;
-  ASSERT_THROW(
-      response::Parser::parse(message.begin(), message.end(), body),
-      std::runtime_error
+  sink::String sink;
+
+  ASSERT_FALSE(sink.ready());
+  auto response = make_response(message, sink);
+  ASSERT_TRUE(sink.ready());
+  ASSERT_STREQ("", sink.body().c_str());
+
+  ASSERT_EQ(
+      response->header().status_line.status_code,
+      response::attribute::StatusCode::FORBIDDEN
   );
 }
 
-TEST_F(Parser, chunked_real) {
+TEST_F(Response, chunked_real) {
   std::string message(
       "HTTP/1.1 200 OK\r\n"
       "Server: nginx\r\n"
@@ -132,16 +154,18 @@ TEST_F(Parser, chunked_real) {
       "\r\n"
   );
 
-  std::string body;
-  const bool result = response::Parser::parse(
-      message.begin(), message.end(), body
-  );
+  sink::String sink;
 
-  ASSERT_EQ(result, true);
+  ASSERT_FALSE(sink.ready());
+  auto response = make_response(message, sink);
+  ASSERT_TRUE(sink.ready());
+  ASSERT_EQ(
+      response->header().status_line.status_code,
+      response::attribute::StatusCode::OK
+  );
 }
 
 } // namespace unittest
-} // namespace response
 } // namespace http
 } // namespace network
 } // namespace sober
