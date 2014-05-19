@@ -8,6 +8,7 @@
 #include <boost/asio/streambuf.hpp>
 #include <sober/log/Logger.hpp>
 #include <sober/network/http/Stream.fpp>
+#include <sober/network/http/response/grammar/Header.hpp>
 
 namespace sober {
 namespace network {
@@ -18,61 +19,69 @@ class Response {
   using Socket = boost::asio::ip::tcp::socket;
   using Error = boost::system::error_code;
 
-  Response(const Stream& stream);
-  Response(const Stream& stream, Response&&);
-
-  Response(Response&&) = delete;
-  Response& operator=(Response&&) = delete;
-
-  Response(const Response&) = delete;
-  Response& operator=(const Response&) = delete;
+  Response(std::size_t buffer_size, Sink& sink);
 
   template <class Handler>
-  void async_read(
-      Socket& socket,
-      Handler&& handler
-  );
-
-  bool is_valid() const;
-  const char* log_name() const;
+  void async_read_some(Socket& socket, Handler&& handler) noexcept;
 
   /**
-    * @throw @c std::runtime_error if is_valid is false
+    * @return true - Stop async reading
+    * @return false - Continue async reading
     */
-  const std::string& get_body() const;
+  bool on_read() noexcept;
 
-  void clear();
+  /**
+    * @brief Clear sink and buffer
+    */
+  void clear() noexcept;
+
+  const char* log_name() const noexcept;
 
  private:
-  class CompletionCondition {
-   public:
-    CompletionCondition(Response& response): response_(response) {
-    }
+  using Buffer = std::vector<char>;
+  using Iterator = Buffer::iterator;
 
-    std::size_t operator()(const Error& error, std::size_t bytes_transferred) {
-      return response_.completion_condition(error, bytes_transferred);
-    }
+  static const std::size_t MIN_BUFFER_SIZE = 512;
 
-   private:
-    Response& response_;
-  };
+  Sink& sink;
 
-  std::size_t completion_condition(
-      const Error& error, std::size_t bytes_transferred
-  );
-
-  const Stream& stream_;
   log::Logger log_info_;
   log::Logger log_debug_;
-  boost::asio::streambuf streambuf_;
-  std::string body_;
 
   /**
-    * @brief body_ contains successful HTTP response message body
+    *
     */
-  bool is_valid_;
+  bool header_parsed_;
+  response::attribute::Header header_;
 
-  CompletionCondition completion_condition_;
+  /**
+    * @detail rfc2616, 3.6.1 Chunked Transfer Coding:
+    * chunk-size << crlf << chunk-data << crlf
+    * where the last chunk has chunk-size = 0 and no chunk-data, i.e.:
+    * "0" << crlf << crlf
+    *
+    * If chunk_size_done_ is false, then current read position is on chunk-size:
+    *
+    * chunk-size << crlf << chunk-data << crlf
+    * ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    *
+    * after size successfully read chunk_size_done_ set to true and
+    * chunk_size_ variable init, current read position is on chunk-data:
+    *
+    * chunk-size << crlf << chunk-data << crlf
+    *                       ^~~~~~~~~~~~~~~~~~
+    * bytes_left_ variable init by chunk_size_ value and reduces while
+    * reading data from chunk-data. When bytes_left_ is zero (all data
+    * read) expected crlf
+    */
+  bool chunk_size_done_;
+  std::size_t chunk_size_;
+  std::size_t bytes_left_;
+
+  const grammar::Header<Iterator> header_grammar_;
+  const grammar::ChunkSize<Iterator> chunk_size_grammar_;
+
+  Buffer buffer_;
 };
 
 } // namespace http

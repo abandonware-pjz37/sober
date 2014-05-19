@@ -11,15 +11,11 @@ namespace network {
 namespace http {
 
 template <class Handler>
-inline void Response::async_read(
+inline void Response::async_read_some(
     Socket& socket,
     Handler&& handler
 ) {
-  clear();
-  assert(!is_valid());
-  assert(streambuf_.size() == 0);
-
-  boost::asio::async_read(socket, streambuf_, completion_condition_, handler);
+  socket_.async_read_some(buffer_, handler);
 }
 
 } // namespace http
