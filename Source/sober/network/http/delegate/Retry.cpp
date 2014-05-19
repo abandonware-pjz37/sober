@@ -14,7 +14,7 @@ Retry::Retry(unsigned times, Duration pause_duration):
     times_(init_times_) {
 }
 
-void Retry::on_push_request() {
+void Retry::on_start() {
   times_ = init_times_;
 }
 

@@ -20,7 +20,7 @@ class Interface {
   /**
     * @note On operation start. Init internal state.
     */
-  virtual void on_push_request() {
+  virtual void on_start() {
   }
 
   /**
@@ -71,15 +71,11 @@ class Interface {
   }
 
   /**
-    * @details Handler with reference to body of successfull HTTP-response
-    * @warning body is a reference to @c Stream internals. Effectively
-    * this means that if @c Stream instance will be used, then body can
-    * change his value; For example: if reference to body will be saved and
-    * other @method Stream::push_request operation will be called
-    * (and processed), then the reference will no longer point to correct
-    * body value.
+    * @details Successfull HTTP-response event:
+    * 1. body is ready
+    * 2. status code is OK
     */
-  virtual void on_success(const std::string& body) {
+  virtual void on_success() {
   }
 };
 

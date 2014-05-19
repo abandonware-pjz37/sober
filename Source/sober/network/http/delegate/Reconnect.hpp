@@ -17,7 +17,7 @@ class Reconnect: virtual public Interface {
 
   Reconnect(Duration period);
 
-  virtual void on_push_request() override;
+  virtual void on_start() override;
   virtual bool force_reconnect() override;
   virtual Iterator pick_connect_endpoint(Iterator iterator) override;
   virtual boost::posix_time::time_duration watchdog_period() override;

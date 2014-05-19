@@ -11,7 +11,7 @@ namespace delegate {
 Reconnect::Reconnect(Duration period): period_(period) {
 }
 
-void Reconnect::on_push_request() {
+void Reconnect::on_start() {
   current_ = Iterator();
   force_reconnect_ = true;
 }

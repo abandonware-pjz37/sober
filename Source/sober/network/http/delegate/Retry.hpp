@@ -17,7 +17,7 @@ class Retry: virtual public Interface {
 
   Retry(unsigned times, Duration pause_duration);
 
-  virtual void on_push_request() override;
+  virtual void on_start() override;
   virtual bool restart_on_error() override;
   virtual boost::posix_time::time_duration restart_pause() override;
 
