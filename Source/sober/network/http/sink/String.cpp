@@ -3,6 +3,8 @@
 
 #include <sober/network/http/sink/String.hpp>
 
+#include <exception> // std::runtime_error
+
 namespace sober {
 namespace network {
 namespace http {
@@ -14,10 +16,10 @@ String::String() noexcept {
 
 void String::clear() noexcept {
   ready_ = false;
-  value_.clear();
+  body_.clear();
 }
 
-void String::write(char* buffer, std::size_t size, bool finish) {
+void String::write(const char* buffer, std::size_t size, bool finish) {
   if (ready()) {
     throw std::runtime_error("Already finished");
   }

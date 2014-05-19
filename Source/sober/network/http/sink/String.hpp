@@ -6,6 +6,8 @@
 
 #include <sober/network/http/Sink.hpp>
 
+#include <string>
+
 namespace sober {
 namespace network {
 namespace http {
@@ -15,13 +17,18 @@ class String: public Sink {
  public:
   String() noexcept;
 
-  void clear() override noexcept;
+  void clear() noexcept override;
 
   /**
     * @throws @c std::runtime_error if already finished
     */
-  void write(char* buffer, std::size_t size, bool finish) override;
+  void write(const char* buffer, std::size_t size, bool finish) override;
 
+  /**
+    * @return true - body can be read
+    * @return false - body is not valid
+    * @note Requests with status code != OK have valid body
+    */
   bool ready() const noexcept;
 
   /**
