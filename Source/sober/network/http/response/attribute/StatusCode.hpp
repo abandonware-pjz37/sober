@@ -4,6 +4,8 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
+#include <iosfwd> // std::ostream
+
 namespace sober {
 namespace network {
 namespace http {
@@ -53,6 +55,8 @@ enum class StatusCode {
   GATEWAY_TIME_OUT = 504,
   HTTP_VERSION_NOT_SUPPORTED = 505
 };
+
+std::ostream& operator<< (std::ostream&, StatusCode);
 
 } // namespace attribute
 } // namespace response
