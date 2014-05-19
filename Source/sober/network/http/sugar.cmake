@@ -13,15 +13,23 @@ include(sugar_include)
 sugar_include(delegate)
 sugar_include(request)
 sugar_include(response)
+sugar_include(sink)
+sugar_include(unittest)
 
 sugar_files(
     SOBER_SOURCES
     ConnectManager.cpp
     ConnectManager.hpp
     ConnectManager.ipp
+    Request.cpp
+    Request.fpp
+    Request.hpp
+    Request.ipp
     Response.cpp
     Response.hpp
     Response.ipp
+    Sink.fpp
+    Sink.hpp
     Statistic.cpp
     Statistic.hpp
     Stream.cpp

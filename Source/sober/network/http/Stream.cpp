@@ -8,15 +8,15 @@
 #include <sober/log/Severity.hpp>
 #include <sober/network/Engine.ipp>
 #include <sober/network/http/ConnectManager.ipp> // connect_manager_
+#include <sober/network/http/Request.ipp> // request_
+#include <sober/network/http/Response.ipp> // response_
 #include <sober/network/http/delegate/Interface.hpp>
-#include <sober/network/http/request/Request.ipp> // request_
-#include <sober/network/http/response/Response.ipp> // response_
 
 namespace sober {
 namespace network {
 namespace http {
 
-Stream::Stream(Engine& engine):
+Stream::Stream(Engine& engine, Request& request, Response& response):
     log_debug_(*this, log::Severity::DEBUG),
     log_info_(*this, log::Severity::INFO),
     log_error_(*this, log::Severity::ERROR),
@@ -24,13 +24,13 @@ Stream::Stream(Engine& engine):
     socket_(engine.io_service),
     in_progress_(false),
     force_stop_(false),
-    request_(*this),
-    response_(*this),
+    request_(request),
+    response_(response),
     connect_manager_(engine),
     resolve_handler_(*this),
     connect_handler_(*this),
     write_handler_(*this),
-    read_handler_(*this),
+    read_some_handler_(*this),
     restart_handler_(*this),
     watchdog_handler_(*this),
     restart_timer_(engine.io_service),
@@ -38,7 +38,6 @@ Stream::Stream(Engine& engine):
 }
 
 void Stream::set_endpoint(const ::network::uri& uri) {
-  on_request_update();
   connect_manager_.set_endpoint(uri);
 
   if (uri.path()) {
@@ -46,17 +45,17 @@ void Stream::set_endpoint(const ::network::uri& uri) {
     if (path.empty()) {
       path = "/";
     }
-    set_path(path.c_str());
+    request_.set_path(path.c_str());
   }
   else {
-    set_path("/");
+    request_.set_path("/");
   }
 
   if (uri.query()) {
-    set_query(uri.query()->to_string());
+    request_.set_query(uri.query()->to_string());
   }
   else {
-    clear_query();
+    request_.clear_query();
   }
 }
 
@@ -64,44 +63,15 @@ void Stream::set_endpoint(const std::string& endpoint) {
   set_endpoint(::network::uri(endpoint));
 }
 
-void Stream::set_method(request::Method method) {
-  on_request_update();
-  request_.set_method(method);
-}
-
-void Stream::set_path(const char* path) {
-  on_request_update();
-  request_.set_path(path);
-}
-
-void Stream::set_query(const char* key, const std::string& value) {
-  on_request_update();
-  request_.set_query(key, value);
-}
-
-void Stream::set_query(const std::string& query) {
-  on_request_update();
-  request_.set_query(query);
-}
-
-void Stream::clear_query() {
-  on_request_update();
-  request_.clear_query();
-}
-
 void Stream::set_delegate(delegate::Interface& delegate) {
   delegate_ = &delegate;
 }
 
-const std::string& Stream::host() const {
-  return connect_manager_.host();
-}
-
-void Stream::push_request() {
-  BOOST_LOG(log_debug_) << "push request";
+void Stream::async_start() {
+  BOOST_LOG(log_debug_) << "async start";
 
   if (delegate_ != nullptr) {
-    delegate_->on_push_request();
+    delegate_->on_start();
   }
 
   // only one request is allowed, check there is no request in process already
@@ -111,7 +81,6 @@ void Stream::push_request() {
   check_in_progress(); // sanity check
 
   force_stop_ = false;
-  response_.clear();
 
   if (delegate_ != nullptr) {
     watchdog_timer_.expires_from_now(delegate_->watchdog_period());
@@ -119,14 +88,6 @@ void Stream::push_request() {
   }
 
   start();
-}
-
-bool Stream::response_valid() const {
-  return response_.is_valid();
-}
-
-const std::string& Stream::response_body() const {
-  return response_.get_body();
 }
 
 const Statistic& Stream::statistic() const noexcept {
@@ -139,13 +100,6 @@ void Stream::clear_statistic() noexcept {
 
 const char* Stream::log_name() const noexcept {
   return "sober.network.http.Stream";
-}
-
-void Stream::on_request_update() {
-  check_not_in_progress();
-
-  // HTTP-response is not valid now
-  response_.clear();
 }
 
 void Stream::check_not_in_progress() {
@@ -212,6 +166,8 @@ void Stream::restart_operation() {
 void Stream::start() {
   BOOST_LOG(log_debug_) << "start";
 
+  response_.clear();
+
   const Error error;
   if (stop_condition(error, "start")) {
     return;
@@ -258,7 +214,7 @@ void Stream::connect_handler(const Error &error, Resolver::iterator iterator) {
   check_in_progress();
 
   BOOST_LOG(log_info_) << "write request";
-  request_.async_write(socket_, write_handler_);
+  request_.async_write(socket_, connect_manager_.host(), write_handler_);
 }
 
 void Stream::write_handler(const Error &error, std::size_t bytes_transferred) {
@@ -274,10 +230,16 @@ void Stream::write_handler(const Error &error, std::size_t bytes_transferred) {
   // number of writen bytes must be equals to request size
   request_.verify_size_on_write_done(bytes_transferred);
 
-  response_.async_read(socket_, read_handler_);
+  response_.async_read_some(socket_, read_some_handler_);
 }
 
-void Stream::read_handler(const Error &error, std::size_t bytes_transferred) {
+void Stream::read_some_handler(
+    const Error &error, std::size_t bytes_transferred
+) {
+  if (!error) {
+    BOOST_LOG(log_debug_) << bytes_transferred << " bytes read";
+  }
+
   if (stop_condition(error, "read")) {
     connect_manager_.clear_connected();
     return;
@@ -285,13 +247,21 @@ void Stream::read_handler(const Error &error, std::size_t bytes_transferred) {
 
   check_in_progress();
 
-  if (
-      !response_.is_valid() &&
-      (delegate_ != nullptr) &&
-      delegate_->restart_on_error()
-  ) {
-    BOOST_LOG(log_info_) << "restart operation (response is not valid)";
-    return restart_operation();
+  const bool do_stop = response_.on_read(bytes_transferred);
+  if (!do_stop) {
+    response_.async_read_some(socket_, read_some_handler_);
+    return;
+  }
+
+  using StatusCode = response::attribute::StatusCode;
+  const StatusCode status_code = response_.header().status_line.status_code;
+  const bool success = (status_code == StatusCode::OK);
+  if (!success) {
+    BOOST_LOG(log_info_) << "Status code is not OK: " << status_code;
+    if ((delegate_ != nullptr) && delegate_->restart_on_error()) {
+      BOOST_LOG(log_info_) << "restart operation (status code)";
+      return restart_operation();
+    }
   }
 
   in_progress_ = false;
@@ -301,8 +271,8 @@ void Stream::read_handler(const Error &error, std::size_t bytes_transferred) {
 
   BOOST_LOG(log_info_) << "read done (" << bytes_transferred << " bytes)";
 
-  if (delegate_ != nullptr && response_.is_valid()) {
-    delegate_->on_success(response_.get_body());
+  if (delegate_ != nullptr && success) {
+    delegate_->on_success();
   }
 }
 

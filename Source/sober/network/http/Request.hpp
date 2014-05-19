@@ -9,7 +9,6 @@
 #include <boost/asio/ip/tcp.hpp> // socket
 #include <boost/asio/streambuf.hpp>
 #include <sober/log/Logger.hpp>
-#include <sober/network/http/Stream.fpp>
 #include <sober/network/http/request/Method.fpp>
 #include <string>
 
@@ -25,8 +24,7 @@ class Request {
  public:
   using Socket = boost::asio::ip::tcp::socket;
 
-  Request(const Stream&);
-  Request(const Stream&, Request&&);
+  Request();
 
   Request(Request&&) = delete;
   Request& operator=(Request&&) = delete;
@@ -34,7 +32,7 @@ class Request {
   Request(const Request&) = delete;
   Request& operator=(const Request&) = delete;
 
-  void set_method(Method method);
+  void set_method(request::Method method);
 
   void set_path(const char* path);
   void set_query(const char* key, const std::string& value);
@@ -42,15 +40,14 @@ class Request {
   void clear_query();
 
   template <class Handler>
-  void async_write(Socket& socket, Handler&& handler);
+  void async_write(Socket& socket, const std::string& host, Handler&& handler);
   void verify_size_on_write_done(std::size_t bytes_transferred) const;
 
   const char* log_name() const;
 
  private:
-  void fill_streambuf();
+  void fill_streambuf(const std::string& host);
 
-  const Stream& stream_;
   log::Logger log_info_;
   log::Logger log_debug_;
 

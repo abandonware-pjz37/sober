@@ -6,6 +6,8 @@
 
 #include <sober/network/http/Response.hpp>
 
+#include <boost/spirit/home/qi/action/action.hpp> // spirit::qi::parse
+
 namespace sober {
 namespace network {
 namespace http {
@@ -15,7 +17,24 @@ inline void Response::async_read_some(
     Socket& socket,
     Handler&& handler
 ) {
-  socket_.async_read_some(buffer_, handler);
+  socket.async_read_some(buffer_.prepare(buffer_size_), handler);
+}
+
+template <class Grammar, class Attribute>
+std::size_t Response::parse(const Grammar& grammar, Attribute& attribute) {
+  namespace qi = boost::spirit::qi;
+
+  Iterator begin = data_ptr();
+
+  const bool ok = qi::parse(begin, begin + buffer_.size(), grammar, attribute);
+  if (!ok) {
+    return 0;
+  }
+
+  const std::size_t length = begin - data_ptr();
+  assert(length != 0);
+  buffer_.consume(length);
+  return length;
 }
 
 } // namespace http

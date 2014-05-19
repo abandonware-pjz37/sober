@@ -6,34 +6,19 @@
 #include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
 #include <network/uri/uri.hpp> // uri::encode_query
 #include <sober/log/Severity.hpp>
-#include <sober/network/http/Stream.hpp>
 #include <sober/network/http/request/Method.hpp>
 
 namespace sober {
 namespace network {
 namespace http {
 
-Request::Request(const Stream& stream):
-    stream_(stream),
+Request::Request():
     log_info_(*this, log::Severity::INFO),
     log_debug_(*this, log::Severity::DEBUG),
-    method_(to_const_char(Method::GET)) {
+    method_(to_const_char(request::Method::GET)) {
 }
 
-Request::Request(const Stream& stream, Request&& r):
-    stream_(stream),
-    log_info_(*this, log::Severity::INFO),
-    log_debug_(*this, log::Severity::DEBUG),
-    request_(), // r.request_ must be empty
-    method_(r.method_),
-    path_(std::move(r.path_)),
-    query_(std::move(r.query_)) {
-  if (r.request_.size() != 0) {
-    throw std::runtime_error("Moving not empty Request");
-  }
-}
-
-void Request::set_method(Method method) {
+void Request::set_method(request::Method method) {
   method_ = to_const_char(method);
   BOOST_LOG(log_info_) << "method: " << method_;
 }
@@ -84,8 +69,8 @@ const char* Request::log_name() const {
   return "sober.network.http.Request";
 }
 
-void Request::fill_streambuf() {
-  BOOST_LOG(log_info_) << "host:" << stream_.host();
+void Request::fill_streambuf(const std::string& host) {
+  BOOST_LOG(log_info_) << "host:" << host;
 
   request_.consume(request_.size()); // clear
   std::ostream os(&request_);
@@ -96,11 +81,11 @@ void Request::fill_streambuf() {
 
   os << method_ << " " << path_ << query_ << " HTTP/1.1\r\n";
 
-  if (stream_.host().empty()) {
+  if (host.empty()) {
     throw std::runtime_error("Internal error: host is empty");
   }
 
-  os << "Host: " << stream_.host() << "\r\n";
+  os << "Host: " << host << "\r\n";
   os << "User-Agent: github.com/ruslo/sober\r\n";
 
   os << "\r\n";

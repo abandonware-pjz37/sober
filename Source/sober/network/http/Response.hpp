@@ -7,8 +7,11 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/streambuf.hpp>
 #include <sober/log/Logger.hpp>
+#include <sober/network/http/Sink.fpp>
 #include <sober/network/http/Stream.fpp>
+#include <sober/network/http/response/grammar/ChunkSize.hpp>
 #include <sober/network/http/response/grammar/Header.hpp>
+#include <sober/network/http/unittest/Response.fpp>
 
 namespace sober {
 namespace network {
@@ -25,28 +28,45 @@ class Response {
   void async_read_some(Socket& socket, Handler&& handler) noexcept;
 
   /**
-    * @return true - Stop async reading
-    * @return false - Continue async reading
+    * @return true - Stop async reading (read successful)
+    * @return false - Need more data, continue async reading
+    * @todo Optimization: check parse error (for now try parse until EOF)
     */
-  bool on_read() noexcept;
+  bool on_read(std::size_t bytes_transferred) noexcept;
 
   /**
     * @brief Clear sink and buffer
     */
   void clear() noexcept;
 
+  const response::attribute::Header& header() const;
+
   const char* log_name() const noexcept;
 
  private:
-  using Buffer = std::vector<char>;
-  using Iterator = Buffer::iterator;
+  friend class ::sober::network::http::unittest::Response;
 
   static const std::size_t MIN_BUFFER_SIZE = 512;
 
-  Sink& sink;
+  /**
+    * @brief For testing only
+    */
+  Response(const std::string& input, Sink& sink);
+
+  using Buffer = boost::asio::streambuf;
+  using Iterator = const char*;
+
+  Iterator data_ptr() const noexcept;
+
+  template <class Grammar, class Attribute>
+  std::size_t parse(const Grammar& grammar, Attribute& attribute);
+
+  Sink& sink_;
 
   log::Logger log_info_;
   log::Logger log_debug_;
+
+  std::size_t buffer_size_;
 
   /**
     *
@@ -78,8 +98,9 @@ class Response {
   std::size_t chunk_size_;
   std::size_t bytes_left_;
 
-  const grammar::Header<Iterator> header_grammar_;
-  const grammar::ChunkSize<Iterator> chunk_size_grammar_;
+  const response::grammar::Header<Iterator> header_grammar_;
+  const response::grammar::ChunkSize<Iterator> chunk_size_grammar_;
+  const response::grammar::CRLF<Iterator> crlf_grammar_;
 
   Buffer buffer_;
 };

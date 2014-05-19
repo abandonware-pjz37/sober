@@ -12,8 +12,8 @@
 #include <sober/network/http/ConnectManager.hpp>
 #include <sober/network/http/Statistic.hpp>
 #include <sober/network/http/delegate/Interface.fpp>
-#include <sober/network/http/request/Request.hpp>
-#include <sober/network/http/response/Response.hpp>
+#include <sober/network/http/Request.hpp>
+#include <sober/network/http/Response.hpp>
 
 namespace network {
 class uri;
@@ -49,7 +49,7 @@ class Stream {
  public:
   using Error = boost::system::error_code;
 
-  Stream(Engine&);
+  Stream(Engine&, Request& request, Response& response);
 
   Stream(Stream&&) = delete;
   Stream& operator=(Stream&&) = delete;
@@ -67,39 +67,15 @@ class Stream {
   void set_endpoint(const ::network::uri& uri);
   //@}
 
-  //@{
-  /**
-    * @note Modifiers of @c Request
-    */
-  void set_method(request::Method method);
-  void set_path(const char* path);
-  void set_query(const char* key, const std::string& value);
-  void set_query(const std::string& query);
-  void clear_query();
-  //@}
-
   /**
     * @note Custom behaviour (timers, retry, success handle, ...)
     */
   void set_delegate(delegate::Interface& delegate);
 
   /**
-    * @note for building @c Request's streambuf
-    */
-  const std::string& host() const;
-
-  /**
     * @brief Add asynchorous operation to @c Engine
     */
-  void push_request();
-
-  //@{
-  /**
-    * @note @c Response getters
-    */
-  bool response_valid() const;
-  const std::string& response_body() const;
-  //@}
+  void async_start();
 
   //@{
   /**
@@ -153,13 +129,13 @@ class Stream {
     Stream& stream_;
   };
 
-  class ReadHandler {
+  class ReadSomeHandler {
    public:
-    ReadHandler(Stream& stream): stream_(stream) {
+    ReadSomeHandler(Stream& stream): stream_(stream) {
     }
 
     void operator()(const Error& error, std::size_t bytes_transferred) {
-      stream_.read_handler(error, bytes_transferred);
+      stream_.read_some_handler(error, bytes_transferred);
     }
 
    private:
@@ -172,10 +148,14 @@ class Stream {
     }
 
     void operator()(const Error& error) {
-      if (error) {
-        throw std::runtime_error("RestartHandler");
+      if (!error) {
+        return stream_.start();
       }
-      stream_.start();
+      if (error == boost::asio::error::operation_aborted) {
+        // ignore this error (cancel by timer)
+        return;
+      }
+      throw std::runtime_error("RestartHandler");
     }
 
    private:
@@ -240,7 +220,7 @@ class Stream {
   void resolve_handler(const Error& error, Resolver::iterator);
   void connect_handler(const Error& error, Resolver::iterator);
   void write_handler(const Error& error, std::size_t bytes_transferred);
-  void read_handler(const Error& error, std::size_t bytes_transferred);
+  void read_some_handler(const Error& error, std::size_t bytes_transferred);
   void watchdog_handler();
 
   log::Logger log_debug_;
@@ -259,8 +239,8 @@ class Stream {
     */
   bool force_stop_;
 
-  request::Request request_;
-  response::Response response_;
+  Request& request_;
+  Response& response_;
 
   ConnectManager connect_manager_;
 
@@ -270,7 +250,7 @@ class Stream {
   ResolveHandler resolve_handler_;
   ConnectHandler connect_handler_;
   WriteHandler write_handler_;
-  ReadHandler read_handler_;
+  ReadSomeHandler read_some_handler_;
   RestartHandler restart_handler_;
   WatchdogHandler watchdog_handler_;
 

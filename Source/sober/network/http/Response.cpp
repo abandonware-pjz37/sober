@@ -3,9 +3,11 @@
 
 #include <sober/network/http/Response.hpp>
 
+#include <algorithm> // std::max
 #include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
-#include <boost/spirit/home/qi/action/action.hpp> // spirit::qi::parse
 #include <sober/log/Severity.hpp>
+#include <sober/network/http/Response.ipp>
+#include <sober/network/http/Sink.hpp>
 
 namespace sober {
 namespace network {
@@ -15,29 +17,38 @@ Response::Response(std::size_t buffer_size, Sink& sink):
     sink_(sink),
     log_info_(*this, log::Severity::INFO),
     log_debug_(*this, log::Severity::DEBUG),
-    buffer_(std::max(buffer_size, MIN_BUFFER_SIZE)) {
+    buffer_size_(
+        (buffer_size < MIN_BUFFER_SIZE) ? MIN_BUFFER_SIZE : buffer_size
+    ) {
 }
 
-bool Response::on_read() noexcept {
+bool Response::on_read(std::size_t bytes_transferred) noexcept {
   using Encoding = response::attribute::TransferEncoding;
-  using qi = boost::spirit::qi;
+
+  buffer_.commit(bytes_transferred);
+
+  if (buffer_.size() == 0) {
+    BOOST_LOG(log_debug_) << "Need more data (buffer is empty)";
+    return false;
+  }
 
   assert(buffer_.size() > 0);
 
   if (!header_parsed_) {
-    Iterator begin = buffer_.begin();
-    Iterator end = buffer_.end();
+    BOOST_LOG(log_debug_) << "Try parse:" << std::endl <<
+        std::string(data_ptr(), data_ptr() + buffer_.size());
 
-    header_parsed_ = qi::parse(begin, end, header_grammar, header_);
+    const std::size_t len = parse(header_grammar_, header_);
+    header_parsed_ = (len != 0);
+
     const char* message =
-        header_parsed_ ? "Header parse failed" : "Successfully parsed";
-    BOOST_LOG(log_debug_) << message << std::endl <<
-        std::string(buffer_.begin(), buffer_.end());
+        header_parsed_ ?  "Successfully parsed" : "Header parse failed";
+    BOOST_LOG(log_debug_) << message;
+
     if (!header_parsed_) {
+      // Need more data (TODO: or incorrect response?)
       return false;
     }
-
-    buffer_.erase(buffer_.begin(), begin);
 
     // Note: if encoding is chunked, content_length is zero
     bytes_left_ = header_.content_length;
@@ -50,22 +61,19 @@ bool Response::on_read() noexcept {
     const std::size_t avail = std::min(bytes_left_, buffer_.size());
     bytes_left_ -= avail;
     const bool finish = (bytes_left_ == 0);
-    sink.write(buffer_.data(), avail, finish);
-    buffer_.erase(buffer_.begin(), buffer_.begin() + avail);
-    return !finish;
+    sink_.write(data_ptr(), avail, finish);
+    buffer_.consume(avail);
+    return finish;
   }
 
   assert(header_.transfer_encoding == Encoding::CHUNKED);
   while (true) {
     if (!chunk_size_done_) {
-      Iterator begin = buffer_.begin();
-      Iterator end = buffer_.end();
-      const bool ok = qi::parse(begin, end, chunk_size_grammar, chunk_size_);
-      if (!ok) {
-        // need more data
+      const std::size_t len = parse(chunk_size_grammar_, chunk_size_);
+      if (len == 0) {
+        // Need more data (TODO: or incorrect response?)
         return false;
       }
-      buffer_.erase(buffer.begin(), begin);
       chunk_size_done_ = true;
       bytes_left_ = chunk_size_;
     }
@@ -73,17 +81,15 @@ bool Response::on_read() noexcept {
     assert(chunk_size_done_);
     if (bytes_left_ == 0) {
       // No more data left in chunk, expected crlf
-      Iterator begin = buffer_.begin();
-      Iterator end = buffer_.end();
-      const bool ok = qi::parse(begin, end, crlf);
-      if (!ok) {
-        // need more data
+      boost::spirit::unused_type attribute;
+      const std::size_t len = parse(crlf_grammar_, attribute);
+      if (len == 0) {
+        // Need more data (TODO: or incorrect response?)
         return false;
       }
-      buffer_.erase(buffer.begin(), begin);
       if (chunk_size_ == 0) {
         // This is the last chunk
-        sink.write(nullptr, 0, true);
+        sink_.write(nullptr, 0, true);
         return true;
       }
       chunk_size_done_ = false;
@@ -94,22 +100,54 @@ bool Response::on_read() noexcept {
     assert(bytes_left_ > 0);
     const std::size_t avail = std::min(bytes_left_, buffer_.size());
     if (avail == 0) {
+      // Need more data
       return false;
     }
     bytes_left_ -= avail;
-    sink.write(buffer_.data(), avail, false);
-    buffer_.erase(buffer_.begin(), buffer_.begin() + avail);
+    sink_.write(data_ptr(), avail, false);
+    buffer_.consume(avail);
   }
 }
 
 void Response::clear() noexcept {
   sink_.clear();
   header_parsed_ = false;
-  buffer_.clear();
+  chunk_size_done_ = false;
+  chunk_size_ = 0;
+  bytes_left_ = 0;
+  buffer_.consume(buffer_.size());
 }
 
-const char* Response::log_name() const {
+const response::attribute::Header& Response::header() const {
+  if (!header_parsed_) {
+    throw std::runtime_error("Header not parsed");
+  }
+  return header_;
+}
+
+const char* Response::log_name() const noexcept {
   return "sober.network.http.Response";
+}
+
+Response::Iterator Response::data_ptr() const noexcept {
+  return boost::asio::buffer_cast<Response::Iterator>(buffer_.data());
+}
+
+Response::Response(const std::string& input, Sink& sink):
+    Response(input.size(), sink) {
+  clear();
+
+  std::ostream os(&buffer_);
+  os << input;
+  os.flush();
+
+  assert(buffer_.size() == input.size());
+
+  // Bytes already commited, so transfer zero bytes
+  const bool finish = on_read(0);
+  if (!finish) {
+    throw std::runtime_error("Parse failed");
+  }
 }
 
 } // namespace http

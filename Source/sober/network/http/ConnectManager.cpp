@@ -7,7 +7,7 @@
 #include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
 #include <network/uri/uri.hpp>
 #include <sober/log/Severity.hpp>
-#include <sober/network/http/request/Request.hpp>
+#include <sober/network/http/Request.hpp>
 
 namespace sober {
 namespace network {

@@ -11,8 +11,10 @@ namespace network {
 namespace http {
 
 template <class Handler>
-void Request::async_write(Socket& socket, Handler&& handler) {
-  fill_streambuf();
+void Request::async_write(
+    Socket& socket, const std::string& host, Handler&& handler
+) {
+  fill_streambuf(host);
   assert(request_.size() != 0);
   boost::asio::async_write(socket, request_, handler);
 }
