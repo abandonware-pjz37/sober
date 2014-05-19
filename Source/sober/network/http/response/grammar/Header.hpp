@@ -1,5 +1,5 @@
-#ifndef SOBER_NETWORK_HTTP_RESPONSE_GRAMMAR_RESPONSE_HPP_
-#define SOBER_NETWORK_HTTP_RESPONSE_GRAMMAR_RESPONSE_HPP_
+#ifndef SOBER_NETWORK_HTTP_RESPONSE_GRAMMAR_HEADER_HPP_
+#define SOBER_NETWORK_HTTP_RESPONSE_GRAMMAR_HEADER_HPP_
 
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
@@ -11,11 +11,10 @@
 #include <boost/spirit/home/support/common_terminals.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 
-#include <sober/network/http/response/attribute/Response.hpp>
+#include <sober/network/http/response/attribute/Header.hpp>
 #include <sober/network/http/response/grammar/CR.hpp>
 #include <sober/network/http/response/grammar/CRLF.hpp>
 #include <sober/network/http/response/grammar/ContentLength.hpp>
-#include <sober/network/http/response/grammar/MessageBody.hpp>
 #include <sober/network/http/response/grammar/StatusLine.hpp>
 #include <sober/network/http/response/grammar/TransferEncoding.hpp>
 
@@ -26,29 +25,29 @@ namespace response {
 namespace grammar {
 
 // 6 Response
+// Header = Response without message-body
 template <class Iterator>
-struct Response: qi::grammar<Iterator, attribute::Response()> {
-  using Base = qi::grammar<Iterator, attribute::Response()>;
+struct Header: qi::grammar<Iterator, attribute::Header()> {
+  using Base = qi::grammar<Iterator, attribute::Header()>;
 
-  Response(): Base(response) {
+  Header(): Base(header) {
     namespace ph = boost::phoenix;
     using qi::_val;
     using qi::_1;
     using ph::at_c;
 
-    // Response:
+    // Header:
     // at_c<0> StatusLine status_line;
     // at_c<1> ContentLength content_length;
     // at_c<2> TransferEncoding transfer_encoding;
-    // at_c<3> std::string message_body;
 
     any_header = +(qi::char_ - cr);
 
-    response = qi::eps[at_c<1>(_val) = 0] >>
+    header = qi::eps[at_c<1>(_val) = 0] >>
         qi::eps[at_c<2>(_val) = attribute::TransferEncoding::OTHER] >>
         status_line[at_c<0>(_val) = _1] >>
         // 7.1 Entity Header Fields (simplified version) --
-        *(
+        +(
             (
                 content_length[at_c<1>(_val) = _1] |
                 transfer_encoding[at_c<2>(_val) = _1] |
@@ -56,7 +55,7 @@ struct Response: qi::grammar<Iterator, attribute::Response()> {
             ) >> crlf
         ) >>
         // --
-        crlf >> message_body(at_c<1>(_val), at_c<2>(_val))[at_c<3>(_val) = _1]
+        crlf;
     ;
   }
 
@@ -65,11 +64,10 @@ struct Response: qi::grammar<Iterator, attribute::Response()> {
   TransferEncoding<Iterator> transfer_encoding;
   CR<Iterator> cr;
   CRLF<Iterator> crlf;
-  MessageBody<Iterator> message_body;
 
   qi::rule<Iterator, void()> any_header;
 
-  qi::rule<Iterator, attribute::Response()> response;
+  qi::rule<Iterator, attribute::Header()> header;
 };
 
 } // namespace grammar
@@ -78,4 +76,4 @@ struct Response: qi::grammar<Iterator, attribute::Response()> {
 } // namespace network
 } // namespace sober
 
-#endif // SOBER_NETWORK_HTTP_RESPONSE_GRAMMAR_RESPONSE_HPP_
+#endif // SOBER_NETWORK_HTTP_RESPONSE_GRAMMAR_HEADER_HPP_

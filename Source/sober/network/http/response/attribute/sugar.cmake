@@ -11,6 +11,7 @@ include(sugar_files)
 
 sugar_files(
     SOBER_SOURCES
+    ChunkSize.hpp
     ContentLength.hpp
     ReasonPhrase.hpp
     Response.hpp

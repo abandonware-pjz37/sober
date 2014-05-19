@@ -14,6 +14,7 @@ sugar_files(
     CR.hpp
     CRLF.hpp
     CTL.hpp
+    ChunkSize.hpp
     ContentLength.hpp
     HT.hpp
     HTTPVersion.hpp
