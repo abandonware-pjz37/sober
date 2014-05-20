@@ -77,6 +77,11 @@ class Stream {
     */
   void async_start();
 
+  /**
+    * @brief Cancel current operation
+    */
+  void cancel();
+
   //@{
   /**
     * @brief HTTP-stream statistic

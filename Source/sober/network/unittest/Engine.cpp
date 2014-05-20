@@ -1,6 +1,7 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
+#include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
 #include <chrono>
 #include <gtest/gtest.h> // TEST_F
 #include <sober/network/Engine.hpp>
@@ -313,6 +314,115 @@ TEST_F(Engine, chain_request) {
   ASSERT_STREQ(result.c_str(), "Hello, request!");
 }
 
+TEST_F(Engine, race) {
+  class Delegate: public http::delegate::Interface {
+   public:
+    Delegate(const char* name, bool& win): name_(name), win_(win) {
+    }
+
+    void on_success() override {
+      if (!win_) {
+        win_ = true;
+        BOOST_LOG(log_) << name_ << " win";
+      }
+    }
+
+   private:
+    const char* name_;
+    bool& win_;
+    boost::log::sources::logger log_;
+  };
+
+  // No need for mutex protection
+  bool win = false;
+
+  Delegate delegate_A("A", win), delegate_B("B", win);
+  http::sink::String sink_A, sink_B;
+  http::Response response_A(0, sink_A), response_B(0, sink_B);
+  http::Request request_A, request_B;
+
+  http::Stream stream_A(engine_, request_A, response_A);
+  http::Stream stream_B(engine_, request_B, response_B);
+
+  stream_A.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
+  stream_B.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
+
+  stream_A.set_delegate(delegate_A);
+  stream_B.set_delegate(delegate_B);
+
+  stream_A.async_start();
+  stream_B.async_start();
+
+  ASSERT_FALSE(win);
+  engine_.run();
+  ASSERT_TRUE(win);
+
+  ASSERT_TRUE(sink_A.ready());
+  ASSERT_TRUE(sink_B.ready());
+
+  ASSERT_STREQ(sink_A.body().c_str(), "Hello, request!");
+  ASSERT_STREQ(sink_B.body().c_str(), "Hello, request!");
+
+  ASSERT_EQ(
+      response_A.header().status_line.status_code,
+      http::response::attribute::StatusCode::OK
+  );
+  ASSERT_EQ(
+      response_B.header().status_line.status_code,
+      http::response::attribute::StatusCode::OK
+  );
+}
+
+TEST_F(Engine, race_with_cancel) {
+  class Delegate: public http::delegate::Interface {
+   public:
+    Delegate(const char* name, http::Stream& other):
+        name_(name),
+        other_(other) {
+    }
+
+    void on_success() override {
+      BOOST_LOG(log_) << name_ << " win";
+      other_.cancel();
+    }
+
+   private:
+    const char* name_;
+    boost::log::sources::logger log_;
+    http::Stream& other_;
+  };
+
+  http::sink::String sink_A, sink_B;
+  http::Response response_A(0, sink_A), response_B(0, sink_B);
+  http::Request request_A, request_B;
+
+  http::Stream stream_A(engine_, request_A, response_A);
+  http::Stream stream_B(engine_, request_B, response_B);
+
+  stream_A.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
+  stream_B.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
+
+  Delegate delegate_A("A", stream_B), delegate_B("B", stream_A);
+
+  stream_A.set_delegate(delegate_A);
+  stream_B.set_delegate(delegate_B);
+
+  stream_A.async_start();
+  stream_B.async_start();
+
+  engine_.run();
+
+  ASSERT_EQ(sink_A.ready() + sink_B.ready(), 1);
+
+  http::sink::String& sink_good = sink_A.ready() ? sink_A : sink_B;
+  http::Response& response_good = sink_A.ready() ? response_A : response_B;
+
+  ASSERT_STREQ(sink_good.body().c_str(), "Hello, request!");
+  ASSERT_EQ(
+      response_good.header().status_line.status_code,
+      http::response::attribute::StatusCode::OK
+  );
+}
 } // namespace unittest
 } // namespace network
 } // namespace sober

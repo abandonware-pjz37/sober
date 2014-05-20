@@ -90,6 +90,18 @@ void Stream::async_start() {
   start();
 }
 
+void Stream::cancel() {
+  BOOST_LOG(log_info_) << "cancel";
+
+  force_stop_ = true;
+  in_progress_ = false;
+  check_not_in_progress(); // sanity check
+
+  socket_.close();
+  watchdog_timer_.cancel();
+  restart_timer_.cancel();
+}
+
 const Statistic& Stream::statistic() const noexcept {
   return statistic_;
 }
@@ -133,14 +145,7 @@ bool Stream::stop_condition(const Error& error, const char* operation) {
     }
   }
 
-  force_stop_ = true;
-  in_progress_ = false;
-  check_not_in_progress(); // sanity check
-
-  socket_.close();
-  watchdog_timer_.cancel();
-  restart_timer_.cancel();
-
+  cancel();
   return true;
 }
 
@@ -192,7 +197,7 @@ void Stream::resolve_handler(const Error &error, Resolver::iterator iterator) {
   }
 
   if (!connect_manager_.is_connected()) {
-    BOOST_LOG(log_info_) << "resolved: ";
+    BOOST_LOG(log_info_) << "resolved:";
     int i = 1;
     for (Resolver::iterator it = iterator; it != Resolver::iterator(); it++) {
       BOOST_LOG(log_info_) << "  " << i << ": " << it->endpoint();
