@@ -134,7 +134,8 @@ std::ostream& operator<< (std::ostream& stream, StatusCode status_code) {
       stream << "HTTP Version not supported (505)";
       break;
     default:
-      throw std::runtime_error("StatusCode operator<<");
+      stream << "!UNKNOWN! (" << static_cast<int>(status_code) << ")";
+      break;
   }
   return stream;
 }
