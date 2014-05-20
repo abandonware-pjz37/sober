@@ -23,8 +23,8 @@
 # Temp build directory
 _builds/*
 
-# Temp build script
-build.sh
+# Temp install directory
+_install/*
 
 # Temp macosx
 */.DS_Store
