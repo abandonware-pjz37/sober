@@ -4,19 +4,28 @@
 cmake_minimum_required(VERSION 3.0)
 project(Sober)
 
+### Build Options ###
 option(SOBER_RUN_LONG_TESTS "Run long unit tests" OFF)
 
+### Download dependencies ###
 include(HunterGate.cmake)
 hunter_add_package(Boost COMPONENTS thread system log)
 hunter_add_package(CppNetlibUri)
 hunter_add_package(Sugar)
 
+### Find dependencies ###
+set(Boost_USE_STATIC_LIBS ON)
+find_package(Boost REQUIRED thread system log log_setup)
+find_package(GTest CONFIG REQUIRED)
+find_package(CppNetlibUri CONFIG REQUIRED)
+
+### - ###
 include("${SUGAR_ROOT}/cmake/Sugar")
 include(sugar_add_gtest)
 include(sugar_groups_generate)
 include(sugar_include)
 
-# init variables:
+### Target sources. Init variables: ###
 #   SOBER_SOURCES
 #   SOBER_UT_SOURCES
 #   SOBER_LONG_UT_SOURCES
@@ -24,15 +33,12 @@ sugar_include("./Source/sober")
 
 list(APPEND SOBER_SOURCES ${SUGAR_SOURCES}) # append used cmake modules
 
+### Source groups (MSVC, Xcode) ###
 sugar_groups_generate(${SOBER_SOURCES})
 sugar_groups_generate(${SOBER_UT_SOURCES})
 sugar_groups_generate(${SOBER_LONG_UT_SOURCES})
 
-set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost REQUIRED thread system log log_setup)
-find_package(GTest CONFIG REQUIRED)
-find_package(CppNetlibUri CONFIG REQUIRED)
-
+### Targets ###
 add_library(sober ${SOBER_SOURCES})
 
 add_executable(sober_ut ${SOBER_UT_SOURCES})
@@ -68,6 +74,7 @@ endif()
 target_include_directories(sober SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
 target_link_libraries(sober PUBLIC ${Boost_LIBRARIES} network-uri)
 
+### Testing ###
 enable_testing()
 sugar_add_gtest(SoberUt sober_ut)
 if(TARGET sober_long_ut)
