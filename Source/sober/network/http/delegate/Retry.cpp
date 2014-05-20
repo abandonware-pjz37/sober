@@ -18,6 +18,18 @@ void Retry::on_start() {
   times_ = init_times_;
 }
 
+bool Retry::restart_on_error(const boost::system::error_code&) {
+  return restart_on_error();
+}
+
+bool Retry::restart_on_error(const response::attribute::StatusCode&) {
+  return restart_on_error();
+}
+
+boost::posix_time::time_duration Retry::restart_pause() {
+  return pause_duration_;
+}
+
 bool Retry::restart_on_error() {
   if (times_ == 0) {
     return false;
@@ -25,10 +37,6 @@ bool Retry::restart_on_error() {
 
   --times_;
   return true;
-}
-
-boost::posix_time::time_duration Retry::restart_pause() {
-  return pause_duration_;
 }
 
 } // namespace delegate

@@ -18,10 +18,15 @@ class Retry: virtual public Interface {
   Retry(unsigned times, Duration pause_duration);
 
   virtual void on_start() override;
-  virtual bool restart_on_error() override;
+  virtual bool restart_on_error(const boost::system::error_code&) override;
+  virtual bool restart_on_error(
+      const response::attribute::StatusCode&
+  ) override;
   virtual boost::posix_time::time_duration restart_pause() override;
 
  private:
+  bool restart_on_error();
+
   const unsigned init_times_;
   const Duration pause_duration_;
 

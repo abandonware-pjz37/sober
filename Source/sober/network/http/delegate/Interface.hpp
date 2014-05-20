@@ -7,6 +7,7 @@
 #include <sober/network/http/delegate/Interface.fpp>
 
 #include <boost/asio/ip/tcp.hpp>
+#include <sober/network/http/response/attribute/StatusCode.fpp>
 
 namespace sober {
 namespace network {
@@ -47,13 +48,19 @@ class Interface {
     return iterator;
   }
 
+  //@{
   /**
     * @details Do restart if error occurs
     * @note Called when error occurs
     */
-  virtual bool restart_on_error() {
+  virtual bool restart_on_error(const boost::system::error_code&) {
     return false;
   }
+
+  virtual bool restart_on_error(const response::attribute::StatusCode&) {
+    return false;
+  }
+  //@}
 
   /**
     * @details Watchdog callback period

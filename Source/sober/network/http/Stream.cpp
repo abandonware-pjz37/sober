@@ -139,7 +139,7 @@ bool Stream::stop_condition(const Error& error, const char* operation) {
     BOOST_LOG(log_error_) << "operation `" << operation << "` failed: " <<
         error.message();
 
-    if ((delegate_ != nullptr) && delegate_->restart_on_error()) {
+    if ((delegate_ != nullptr) && delegate_->restart_on_error(error)) {
       restart_operation();
       return true;
     }
@@ -272,7 +272,7 @@ void Stream::read_some_handler(
   const bool success = (status_code == StatusCode::OK);
   if (!success) {
     BOOST_LOG(log_info_) << "Status code is not OK: " << status_code;
-    if ((delegate_ != nullptr) && delegate_->restart_on_error()) {
+    if ((delegate_ != nullptr) && delegate_->restart_on_error(status_code)) {
       BOOST_LOG(log_info_) << "restart operation (status code)";
       return restart_operation();
     }

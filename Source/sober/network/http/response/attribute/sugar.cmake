@@ -15,6 +15,7 @@ sugar_files(
     ContentLength.hpp
     ReasonPhrase.hpp
     StatusCode.cpp
+    StatusCode.fpp
     StatusCode.hpp
     StatusLine.hpp
     TEXT.hpp
