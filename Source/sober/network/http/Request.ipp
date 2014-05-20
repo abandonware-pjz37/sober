@@ -6,6 +6,8 @@
 
 #include <sober/network/http/Request.hpp>
 
+#include <boost/asio/write.hpp> // asio::async_write
+
 namespace sober {
 namespace network {
 namespace http {
