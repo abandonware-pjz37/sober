@@ -152,15 +152,24 @@ void Stream::restart_operation() {
   BOOST_LOG(log_info_) << "restart operation";
   statistic_.on_restart();
 
-  boost::posix_time::time_duration pause = delegate_->restart_pause();
+  // Note: Do not start operation synchronously.
+  // connect_manager_.clear_connected must be called before next operation
+  // started (otherwise cached value will be used without new connection
+  // initialized).
 
-  if (pause.ticks() == 0) {
-    start();
-  }
-  else {
-    restart_timer_.expires_from_now(pause);
-    restart_timer_.async_wait(restart_handler_);
-  }
+  // Scenario:
+  //   * operation failed with EOF (Stream::read_some_handler) ->
+  //     * stop_condition = true (must reset connect_manager_) ->
+  //       * Stream::start -> resolve_handler -> connect_handler (!no reconnect)
+
+  // Expected:
+  //   * operation failed with EOF (Stream::read_some_handler) ->
+  //     * stop_condition = true, schedule async start ->
+  //       * connect_handler_.clear_connected() ->
+  //         * (wait async operation...)
+  //           * Stream::start -> resolve_handler -> connect_handler, reconnect
+  restart_timer_.expires_from_now(delegate_->restart_pause());
+  restart_timer_.async_wait(restart_handler_);
 }
 
 void Stream::start() {
