@@ -12,8 +12,9 @@ hunter_add_package(CppNetlibUri)
 hunter_add_package(Sugar)
 
 include("${SUGAR_ROOT}/cmake/Sugar")
-include(sugar_include)
+include(sugar_add_gtest)
 include(sugar_groups_generate)
+include(sugar_include)
 
 # init variables:
 #   SOBER_SOURCES
@@ -51,11 +52,24 @@ target_include_directories(
     "$<INSTALL_INTERFACE:${INCL_DEST}>"
 )
 
-target_compile_definitions(
-    sober
-    PUBLIC
-    BOOST_SPIRIT_USE_PHOENIX_V3
-)
+target_compile_definitions(sober PUBLIC BOOST_SPIRIT_USE_PHOENIX_V3)
+
+if(MSVC)
+  target_compile_definitions(sober PUBLIC BOOST_ALL_NO_LIB=1)
+endif()
+
+# Detect iOS build
+string(COMPARE EQUAL "${CMAKE_OSX_SYSROOT}" "iphoneos" is_ios)
+if(is_ios)
+  # Strange iOS alignment(?) bug (TODO)
+  target_compile_definitions(sober PUBLIC BOOST_SP_NO_SYNC)
+endif()
 
 target_include_directories(sober SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
 target_link_libraries(sober PUBLIC ${Boost_LIBRARIES} network-uri)
+
+enable_testing()
+sugar_add_gtest(SoberUt sober_ut)
+if(TARGET sober_long_ut)
+  sugar_add_gtest(SoberLongUt sober_long_ut)
+endif()
