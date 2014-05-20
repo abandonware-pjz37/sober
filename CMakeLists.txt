@@ -58,7 +58,7 @@ target_include_directories(
     "$<INSTALL_INTERFACE:${INCL_DEST}>"
 )
 
-target_compile_definitions(sober PUBLIC BOOST_SPIRIT_USE_PHOENIX_V3)
+target_compile_definitions(sober PUBLIC BOOST_SPIRIT_USE_PHOENIX_V3=1)
 
 if(MSVC)
   target_compile_definitions(sober PUBLIC BOOST_ALL_NO_LIB=1)
@@ -80,3 +80,29 @@ sugar_add_gtest(SoberUt sober_ut)
 if(TARGET sober_long_ut)
   sugar_add_gtest(SoberLongUt sober_long_ut)
 endif()
+
+### Install ###
+set(CONF_DEST "lib/cmake/Sober")
+set(LIBR_DEST "lib")
+set(INCL_DEST "include")
+
+include(CMakePackageConfigHelpers)
+set(sober_config "${CMAKE_CURRENT_BINARY_DIR}/SoberConfig.cmake")
+configure_package_config_file(
+    "SoberConfig.cmake.in"
+    ${sober_config}
+    INSTALL_DESTINATION ${CONF_DEST}
+    PATH_VARS CONF_DEST
+)
+
+install(FILES "${sober_config}" DESTINATION ${CONF_DEST})
+install(TARGETS sober DESTINATION ${LIBR_DEST} EXPORT SoberTargets)
+install(
+    DIRECTORY "Source/sober"
+    DESTINATION ${INCL_DEST}
+    FILES_MATCHING
+    PATTERN "*.fpp"
+    PATTERN "*.hpp"
+    PATTERN "*.ipp"
+)
+install(EXPORT SoberTargets DESTINATION ${CONF_DEST})
