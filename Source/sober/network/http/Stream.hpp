@@ -29,19 +29,23 @@ namespace http {
   * @code
   * // 1. Init
   * Engine engine;
+  * sink::String sink = ...; // any class with delegate::Interface interface
   * Stream stream(engine);
-  * // 2. Config
+  * stream.set_delegate(sink);
+  * // 2. Configure request and response
   * stream.set_endpoint(...);
-  * stream.set_method(...); // opt
-  * stream.set_path(...); // opt
-  * stream.set_query(...); // opt
-  * // 3. Push request
-  * stream.push_request(...);
+  * stream.request.set_method(...); // opt
+  * stream.request.set_path(...); // opt
+  * stream.request.set_query(...); // opt
+  * stream.response.set_buffer_size(...); // opt
+  * // 3. Init request asynchronously
+  * stream.async_start(...);
   * // 4. Process
   * engine.run();
-  * // 5. Response
-  * if (stream.response_valid()) {
-  *   auto message = stream.response_body();
+  * // 5. Response (or using delegate::Interface::on_success)
+  * if (sink.ready()) {
+  *   // Check stream.response.header().status_line.status_code if needed
+  *   auto message = sink.body();
   * }
   * @endcode
   */
@@ -49,7 +53,7 @@ class Stream {
  public:
   using Error = boost::system::error_code;
 
-  Stream(Engine&, Request& request, Response& response);
+  Stream(Engine&);
 
   Stream(Stream&&) = delete;
   Stream& operator=(Stream&&) = delete;
@@ -91,6 +95,9 @@ class Stream {
   //@}
 
   const char* log_name() const noexcept;
+
+  Request request;
+  Response response;
 
  private:
   using Resolver = boost::asio::ip::tcp::resolver;
@@ -243,9 +250,6 @@ class Stream {
     * @note stop request (watchdog handler (e.g. by timeout) or error)
     */
   bool force_stop_;
-
-  Request& request_;
-  Response& response_;
 
   ConnectManager connect_manager_;
 

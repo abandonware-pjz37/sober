@@ -1,28 +1,33 @@
-#ifndef SOBER_NETWORK_HTTP_SINK_STRING_HPP_
-#define SOBER_NETWORK_HTTP_SINK_STRING_HPP_
+#ifndef SOBER_NETWORK_HTTP_DELEGATE_STRING_HPP_
+#define SOBER_NETWORK_HTTP_DELEGATE_STRING_HPP_
 
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <sober/network/http/Sink.hpp>
+#include <sober/network/http/delegate/Interface.hpp>
 
 #include <string>
 
 namespace sober {
 namespace network {
 namespace http {
-namespace sink {
+namespace delegate {
 
-class String: public Sink {
+class String: virtual public Interface {
  public:
   String() noexcept;
 
-  void clear() noexcept override;
+  void body_start() noexcept override;
 
   /**
     * @throws @c std::runtime_error if already finished
     */
-  void write(const char* buffer, std::size_t size, bool finish) override;
+  void body_write(const char* buffer, std::size_t size) override;
+
+  /**
+    * @throws @c std::runtime_error if already finished
+    */
+  void body_finish() override;
 
   /**
     * @return true - body can be read
@@ -41,9 +46,9 @@ class String: public Sink {
   std::string body_;
 };
 
-} // namespace sink
+} // namespace delegate
 } // namespace http
 } // namespace network
 } // namespace sober
 
-#endif // SOBER_NETWORK_HTTP_SINK_STRING_HPP_
+#endif // SOBER_NETWORK_HTTP_DELEGATE_STRING_HPP_

@@ -7,19 +7,25 @@
 #include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
 #include <sober/log/Severity.hpp>
 #include <sober/network/http/Response.ipp>
-#include <sober/network/http/Sink.hpp>
+#include <sober/network/http/delegate/Interface.hpp>
 
 namespace sober {
 namespace network {
 namespace http {
 
-Response::Response(std::size_t buffer_size, Sink& sink):
-    sink_(sink),
+Response::Response():
+    delegate_(nullptr),
     log_info_(*this, log::Severity::INFO),
     log_debug_(*this, log::Severity::DEBUG),
-    buffer_size_(
-        (buffer_size < MIN_BUFFER_SIZE) ? MIN_BUFFER_SIZE : buffer_size
-    ) {
+    buffer_size_(DEFAULT_BUFFER_SIZE) {
+}
+
+void Response::set_buffer_size(std::size_t buffer_size) {
+  buffer_size_ = (buffer_size > 0) ? buffer_size : DEFAULT_BUFFER_SIZE;
+}
+
+void Response::set_delegate(delegate::Interface& delegate) {
+  delegate_ = std::addressof(delegate);
 }
 
 bool Response::on_read(std::size_t bytes_transferred) noexcept {
@@ -61,7 +67,13 @@ bool Response::on_read(std::size_t bytes_transferred) noexcept {
     const std::size_t avail = std::min(bytes_left_, buffer_.size());
     bytes_left_ -= avail;
     const bool finish = (bytes_left_ == 0);
-    sink_.write(data_ptr(), avail, finish);
+    if (delegate_ != nullptr) {
+      delegate_->body_write(data_ptr(), avail);
+      if (finish) {
+        delegate_->body_finish();
+      }
+    }
+
     buffer_.consume(avail);
     return finish;
   }
@@ -89,7 +101,9 @@ bool Response::on_read(std::size_t bytes_transferred) noexcept {
       }
       if (chunk_size_ == 0) {
         // This is the last chunk
-        sink_.write(nullptr, 0, true);
+        if (delegate_ != nullptr) {
+          delegate_->body_finish();
+        }
         return true;
       }
       chunk_size_done_ = false;
@@ -104,13 +118,17 @@ bool Response::on_read(std::size_t bytes_transferred) noexcept {
       return false;
     }
     bytes_left_ -= avail;
-    sink_.write(data_ptr(), avail, false);
+    if (delegate_ != nullptr) {
+      delegate_->body_write(data_ptr(), avail);
+    }
     buffer_.consume(avail);
   }
 }
 
 void Response::clear() noexcept {
-  sink_.clear();
+  if (delegate_ != nullptr) {
+    delegate_->body_start();
+  }
   header_parsed_ = false;
   chunk_size_done_ = false;
   chunk_size_ = 0;
@@ -133,8 +151,9 @@ Response::Iterator Response::data_ptr() const noexcept {
   return boost::asio::buffer_cast<Response::Iterator>(buffer_.data());
 }
 
-Response::Response(const std::string& input, Sink& sink):
-    Response(input.size(), sink) {
+Response::Response(const std::string& input, delegate::Interface& delegate):
+    Response() {
+  set_delegate(delegate);
   clear();
 
   std::ostream os(&buffer_);

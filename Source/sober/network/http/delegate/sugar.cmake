@@ -17,6 +17,8 @@ sugar_files(
     Reconnect.hpp
     Retry.cpp
     Retry.hpp
+    String.cpp
+    String.hpp
     Timeout.cpp
     Timeout.hpp
 )

@@ -9,7 +9,7 @@
 #include <sober/network/http/delegate/Reconnect.hpp>
 #include <sober/network/http/delegate/Retry.hpp>
 #include <sober/network/http/delegate/Timeout.hpp>
-#include <sober/network/http/sink/String.hpp>
+#include <sober/network/http/delegate/String.hpp>
 #include <sober/utils/Test.hpp>
 #include <sober/utils/run_duration.hpp>
 
@@ -20,17 +20,13 @@ namespace unittest {
 class Engine: public utils::Test {
  public:
   Engine():
-      response_(RESPONSE_BUFFER_SIZE, sink_),
-      stream_(engine_, request_, response_) {
+      stream_(engine_) {
+    stream_.set_delegate(delegate_);
   }
 
  protected:
-  static const std::size_t RESPONSE_BUFFER_SIZE = 2048;
-
   network::Engine engine_;
-  http::sink::String sink_;
-  http::Response response_;
-  http::Request request_;
+  http::delegate::String delegate_;
   network::http::Stream stream_;
 };
 
@@ -40,10 +36,10 @@ TEST_F(Engine, simple) {
 
   engine_.run();
 
-  ASSERT_TRUE(sink_.ready());
-  ASSERT_STREQ(sink_.body().c_str(), "Hello, request!");
+  ASSERT_TRUE(delegate_.ready());
+  ASSERT_STREQ(delegate_.body().c_str(), "Hello, request!");
   ASSERT_EQ(
-      response_.header().status_line.status_code,
+      stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
   );
 }
@@ -52,28 +48,28 @@ TEST_F(Engine, simple_twice) {
   stream_.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
   stream_.async_start();
   engine_.run();
-  ASSERT_TRUE(sink_.ready());
-  ASSERT_STREQ(sink_.body().c_str(), "Hello, request!");
+  ASSERT_TRUE(delegate_.ready());
+  ASSERT_STREQ(delegate_.body().c_str(), "Hello, request!");
   ASSERT_EQ(
-      response_.header().status_line.status_code,
+      stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
   );
 
   stream_.async_start();
-  ASSERT_FALSE(sink_.ready());
+  ASSERT_FALSE(delegate_.ready());
 
   engine_.run();
-  ASSERT_TRUE(sink_.ready());
-  ASSERT_STREQ(sink_.body().c_str(), "Hello, request!");
+  ASSERT_TRUE(delegate_.ready());
+  ASSERT_STREQ(delegate_.body().c_str(), "Hello, request!");
   ASSERT_EQ(
-      response_.header().status_line.status_code,
+      stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
   );
 }
 
 TEST_F(Engine, simple_query) {
   stream_.set_endpoint("http://pastebin.com/raw.php");
-  request_.set_query("i", "A8wzq8s3");
+  stream_.request.set_query("i", "A8wzq8s3");
   stream_.async_start();
 
   namespace ch = std::chrono;
@@ -84,10 +80,10 @@ TEST_F(Engine, simple_query) {
 
   ASSERT_LT(ch::duration_cast<ch::seconds>(duration).count(), 2);
 
-  ASSERT_TRUE(sink_.ready());
-  ASSERT_STREQ(sink_.body().c_str(), "Hello, request!");
+  ASSERT_TRUE(delegate_.ready());
+  ASSERT_STREQ(delegate_.body().c_str(), "Hello, request!");
   ASSERT_EQ(
-      response_.header().status_line.status_code,
+      stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
   );
 }
@@ -96,26 +92,26 @@ TEST_F(Engine, multiple_query) {
   stream_.set_endpoint("http://pastebin.com/raw.php");
 
   // first request
-  request_.set_query("i", "A8wzq8s3");
+  stream_.request.set_query("i", "A8wzq8s3");
   stream_.async_start();
   engine_.run();
 
-  ASSERT_TRUE(sink_.ready());
-  ASSERT_STREQ(sink_.body().c_str(), "Hello, request!");
+  ASSERT_TRUE(delegate_.ready());
+  ASSERT_STREQ(delegate_.body().c_str(), "Hello, request!");
   ASSERT_EQ(
-      response_.header().status_line.status_code,
+      stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
   );
 
   // second request
-  request_.set_query("i", "zUyXrfcz");
+  stream_.request.set_query("i", "zUyXrfcz");
   stream_.async_start();
   engine_.run();
 
-  ASSERT_TRUE(sink_.ready());
-  ASSERT_STREQ(sink_.body().c_str(), "! One more time");
+  ASSERT_TRUE(delegate_.ready());
+  ASSERT_STREQ(delegate_.body().c_str(), "! One more time");
   ASSERT_EQ(
-      response_.header().status_line.status_code,
+      stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
   );
 }
@@ -134,8 +130,8 @@ TEST_F(Engine, operation_timeout) {
   );
 
   ASSERT_LT(ch::duration_cast<ch::seconds>(duration).count(), 3);
-  ASSERT_FALSE(sink_.ready());
-  ASSERT_THROW(sink_.body(), std::runtime_error);
+  ASSERT_FALSE(delegate_.ready());
+  ASSERT_THROW(delegate_.body(), std::runtime_error);
 }
 
 TEST_F(Engine, retry_on_error) {
@@ -152,12 +148,6 @@ TEST_F(Engine, retry_on_error) {
   engine_.run();
 
   ASSERT_EQ(stream_.statistic().get_restarted(), retry_number);
-
-  ASSERT_TRUE(sink_.ready());
-  ASSERT_EQ(
-      response_.header().status_line.status_code,
-      http::response::attribute::StatusCode::NOT_FOUND
-  );
 }
 
 TEST_F(Engine, retry_with_timeout) {
@@ -185,9 +175,9 @@ TEST_F(Engine, retry_with_timeout) {
   engine_.run();
 
   ASSERT_EQ(stream_.statistic().get_restarted(), retry_number);
-  ASSERT_TRUE(sink_.ready());
+  ASSERT_TRUE(delegate_.ready());
   ASSERT_EQ(
-      response_.header().status_line.status_code,
+      stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::NOT_FOUND
   );
 }
@@ -200,13 +190,6 @@ TEST_F(Engine, default_delegate) {
   stream_.async_start();
 
   engine_.run();
-
-  ASSERT_TRUE(sink_.ready());
-  ASSERT_STREQ(sink_.body().c_str(), "Hello, request!");
-  ASSERT_EQ(
-      response_.header().status_line.status_code,
-      http::response::attribute::StatusCode::OK
-  );
 }
 
 TEST_F(Engine, reconnect_delegate) {
@@ -223,20 +206,17 @@ TEST_F(Engine, reconnect_delegate) {
   engine_.run();
 
   ASSERT_EQ(stream_.statistic().get_reconnect(), 1);
-  ASSERT_FALSE(sink_.ready());
 }
 
 TEST_F(Engine, success_handler) {
-  class Delegate : public http::delegate::Interface {
+  class Delegate : public http::delegate::String {
    public:
-    using Sink = http::sink::String;
-
-    Delegate(const Sink& sink) noexcept: sink_(sink), done_(false) {
+    Delegate() noexcept: done_(false) {
     }
 
     void on_success() noexcept override {
       done_ = true;
-      ASSERT_STREQ(sink_.body().c_str(), "Hello, request!");
+      ASSERT_STREQ(body().c_str(), "Hello, request!");
     }
 
     bool done() const noexcept {
@@ -244,11 +224,10 @@ TEST_F(Engine, success_handler) {
     }
 
    private:
-    const Sink& sink_;
     bool done_;
   };
 
-  Delegate delegate(sink_);
+  Delegate delegate;
 
   stream_.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
   stream_.set_delegate(delegate);
@@ -266,45 +245,33 @@ TEST_F(Engine, chain_request) {
 
   std::string result;
 
-  class Delegate : public http::delegate::Interface {
+  class Delegate : public http::delegate::String {
    public:
-    using Sink = http::sink::String;
-
-    Delegate(
-        http::Stream& stream,
-        http::Request& request,
-        const Sink& sink,
-        std::string& result
-    ) noexcept:
+    Delegate(http::Stream& stream, std::string& result) noexcept:
         stream_(stream),
-        request_(request),
-        sink_(sink),
         first_done_(false),
         result_(result) {
     }
 
     void on_success() noexcept override {
       if (first_done_) {
-        result_ = sink_.body();
+        result_ = body();
         return;
       }
 
-      ASSERT_STREQ(sink_.body().c_str(), "A8wzq8s3");
+      ASSERT_STREQ(body().c_str(), "A8wzq8s3");
       first_done_ = true;
-      request_.set_query("i", sink_.body());
+      stream_.request.set_query("i", body());
       stream_.async_start();
     }
 
    private:
     http::Stream& stream_;
-    http::Request& request_;
-    const Sink& sink_;
-
     bool first_done_;
     std::string& result_;
   };
 
-  Delegate delegate(stream_, request_, sink_, result);
+  Delegate delegate(stream_, result);
   stream_.set_delegate(delegate);
   stream_.set_endpoint("http://pastebin.com/raw.php?i=Peb93awR");
   stream_.async_start();
@@ -315,7 +282,7 @@ TEST_F(Engine, chain_request) {
 }
 
 TEST_F(Engine, race) {
-  class Delegate: public http::delegate::Interface {
+  class Delegate: public http::delegate::String {
    public:
     Delegate(const char* name, bool& win): name_(name), win_(win) {
     }
@@ -337,12 +304,9 @@ TEST_F(Engine, race) {
   bool win = false;
 
   Delegate delegate_A("A", win), delegate_B("B", win);
-  http::sink::String sink_A, sink_B;
-  http::Response response_A(0, sink_A), response_B(0, sink_B);
-  http::Request request_A, request_B;
 
-  http::Stream stream_A(engine_, request_A, response_A);
-  http::Stream stream_B(engine_, request_B, response_B);
+  http::Stream stream_A(engine_);
+  http::Stream stream_B(engine_);
 
   stream_A.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
   stream_B.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
@@ -357,24 +321,24 @@ TEST_F(Engine, race) {
   engine_.run();
   ASSERT_TRUE(win);
 
-  ASSERT_TRUE(sink_A.ready());
-  ASSERT_TRUE(sink_B.ready());
+  ASSERT_TRUE(delegate_A.ready());
+  ASSERT_TRUE(delegate_B.ready());
 
-  ASSERT_STREQ(sink_A.body().c_str(), "Hello, request!");
-  ASSERT_STREQ(sink_B.body().c_str(), "Hello, request!");
+  ASSERT_STREQ(delegate_A.body().c_str(), "Hello, request!");
+  ASSERT_STREQ(delegate_B.body().c_str(), "Hello, request!");
 
   ASSERT_EQ(
-      response_A.header().status_line.status_code,
+      stream_A.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
   );
   ASSERT_EQ(
-      response_B.header().status_line.status_code,
+      stream_B.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
   );
 }
 
 TEST_F(Engine, race_with_cancel) {
-  class Delegate: public http::delegate::Interface {
+  class Delegate: public http::delegate::String {
    public:
     Delegate(const char* name, http::Stream& other):
         name_(name),
@@ -392,12 +356,8 @@ TEST_F(Engine, race_with_cancel) {
     http::Stream& other_;
   };
 
-  http::sink::String sink_A, sink_B;
-  http::Response response_A(0, sink_A), response_B(0, sink_B);
-  http::Request request_A, request_B;
-
-  http::Stream stream_A(engine_, request_A, response_A);
-  http::Stream stream_B(engine_, request_B, response_B);
+  http::Stream stream_A(engine_);
+  http::Stream stream_B(engine_);
 
   stream_A.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
   stream_B.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
@@ -412,14 +372,15 @@ TEST_F(Engine, race_with_cancel) {
 
   engine_.run();
 
-  ASSERT_EQ(sink_A.ready() + sink_B.ready(), 1);
+  ASSERT_EQ(delegate_A.ready() + delegate_B.ready(), 1);
 
-  http::sink::String& sink_good = sink_A.ready() ? sink_A : sink_B;
-  http::Response& response_good = sink_A.ready() ? response_A : response_B;
+  http::delegate::String& sink_good =
+      delegate_A.ready() ? delegate_A : delegate_B;
+  http::Stream& stream_good = delegate_A.ready() ? stream_A : stream_B;
 
   ASSERT_STREQ(sink_good.body().c_str(), "Hello, request!");
   ASSERT_EQ(
-      response_good.header().status_line.status_code,
+      stream_good.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
   );
 }

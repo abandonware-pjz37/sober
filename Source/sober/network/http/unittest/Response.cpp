@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h> // TEST_F
 #include <sober/network/http/Response.hpp>
-#include <sober/network/http/sink/String.hpp>
+#include <sober/network/http/delegate/String.hpp>
 #include <sober/utils/Test.hpp>
 
 namespace sober {
@@ -18,8 +18,8 @@ class Response : public utils::Test {
   using Pointer = std::unique_ptr<http::Response>;
 
   // Workaround for private constructor
-  Pointer make_response(const std::string& message, http::Sink& sink) {
-    return Pointer(new http::Response(message, sink));
+  Pointer make_response(const std::string& message, delegate::Interface& d) {
+    return Pointer(new http::Response(message, d));
   }
 };
 
@@ -34,17 +34,17 @@ TEST_F(Response, content_length_good) {
       "Hello, body!"
   );
 
-  sink::String sink;
+  delegate::String delegate;
 
-  ASSERT_FALSE(sink.ready());
-  auto response = make_response(message, sink);
-  ASSERT_TRUE(sink.ready());
+  ASSERT_FALSE(delegate.ready());
+  auto response = make_response(message, delegate);
+  ASSERT_TRUE(delegate.ready());
 
   ASSERT_EQ(
       response->header().status_line.status_code,
       response::attribute::StatusCode::OK
   );
-  ASSERT_STREQ("Hello, body!", sink.body().c_str());
+  ASSERT_STREQ("Hello, body!", delegate.body().c_str());
 }
 
 TEST_F(Response, content_length_bad) {
@@ -58,11 +58,11 @@ TEST_F(Response, content_length_bad) {
       "Hello, body!"
   );
 
-  sink::String sink;
+  delegate::String delegate;
 
-  ASSERT_FALSE(sink.ready());
-  ASSERT_THROW(make_response(message, sink), std::runtime_error);
-  ASSERT_FALSE(sink.ready());
+  ASSERT_FALSE(delegate.ready());
+  ASSERT_THROW(make_response(message, delegate), std::runtime_error);
+  ASSERT_FALSE(delegate.ready());
 }
 
 TEST_F(Response, chunked_simple) {
@@ -85,13 +85,13 @@ TEST_F(Response, chunked_simple) {
       "\r\n"
   );
 
-  sink::String sink;
+  delegate::String delegate;
 
-  ASSERT_FALSE(sink.ready());
-  auto response = make_response(message, sink);
-  ASSERT_TRUE(sink.ready());
+  ASSERT_FALSE(delegate.ready());
+  auto response = make_response(message, delegate);
+  ASSERT_TRUE(delegate.ready());
 
-  ASSERT_STREQ("ABC", sink.body().c_str());
+  ASSERT_STREQ("ABC", delegate.body().c_str());
   ASSERT_EQ(
       response->header().status_line.status_code,
       response::attribute::StatusCode::OK
@@ -116,12 +116,12 @@ TEST_F(Response, chunked_forbidden) {
       "\r\n"
   );
 
-  sink::String sink;
+  delegate::String delegate;
 
-  ASSERT_FALSE(sink.ready());
-  auto response = make_response(message, sink);
-  ASSERT_TRUE(sink.ready());
-  ASSERT_STREQ("", sink.body().c_str());
+  ASSERT_FALSE(delegate.ready());
+  auto response = make_response(message, delegate);
+  ASSERT_TRUE(delegate.ready());
+  ASSERT_STREQ("", delegate.body().c_str());
 
   ASSERT_EQ(
       response->header().status_line.status_code,
@@ -154,11 +154,11 @@ TEST_F(Response, chunked_real) {
       "\r\n"
   );
 
-  sink::String sink;
+  delegate::String delegate;
 
-  ASSERT_FALSE(sink.ready());
-  auto response = make_response(message, sink);
-  ASSERT_TRUE(sink.ready());
+  ASSERT_FALSE(delegate.ready());
+  auto response = make_response(message, delegate);
+  ASSERT_TRUE(delegate.ready());
   ASSERT_EQ(
       response->header().status_line.status_code,
       response::attribute::StatusCode::OK

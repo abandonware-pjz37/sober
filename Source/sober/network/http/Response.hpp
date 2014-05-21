@@ -7,8 +7,8 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/streambuf.hpp>
 #include <sober/log/Logger.hpp>
-#include <sober/network/http/Sink.fpp>
 #include <sober/network/http/Stream.fpp>
+#include <sober/network/http/delegate/Interface.fpp>
 #include <sober/network/http/response/grammar/ChunkSize.hpp>
 #include <sober/network/http/response/grammar/Header.hpp>
 #include <sober/network/http/unittest/Response.fpp>
@@ -22,7 +22,11 @@ class Response {
   using Socket = boost::asio::ip::tcp::socket;
   using Error = boost::system::error_code;
 
-  Response(std::size_t buffer_size, Sink& sink);
+  Response();
+
+  void set_buffer_size(std::size_t buffer_size);
+
+  void set_delegate(delegate::Interface&);
 
   template <class Handler>
   void async_read_some(Socket& socket, Handler&& handler) noexcept;
@@ -46,12 +50,12 @@ class Response {
  private:
   friend class ::sober::network::http::unittest::Response;
 
-  static const std::size_t MIN_BUFFER_SIZE = 512;
+  static const std::size_t DEFAULT_BUFFER_SIZE = 512;
 
   /**
     * @brief For testing only
     */
-  Response(const std::string& input, Sink& sink);
+  Response(const std::string& input, delegate::Interface&);
 
   using Buffer = boost::asio::streambuf;
   using Iterator = const char*;
@@ -61,7 +65,7 @@ class Response {
   template <class Grammar, class Attribute>
   std::size_t parse(const Grammar& grammar, Attribute& attribute);
 
-  Sink& sink_;
+  delegate::Interface* delegate_;
 
   log::Logger log_info_;
   log::Logger log_debug_;

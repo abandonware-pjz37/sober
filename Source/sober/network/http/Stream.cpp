@@ -16,7 +16,7 @@ namespace sober {
 namespace network {
 namespace http {
 
-Stream::Stream(Engine& engine, Request& request, Response& response):
+Stream::Stream(Engine& engine):
     log_debug_(*this, log::Severity::DEBUG),
     log_info_(*this, log::Severity::INFO),
     log_error_(*this, log::Severity::ERROR),
@@ -24,8 +24,6 @@ Stream::Stream(Engine& engine, Request& request, Response& response):
     socket_(engine.io_service),
     in_progress_(false),
     force_stop_(false),
-    request_(request),
-    response_(response),
     connect_manager_(engine),
     resolve_handler_(*this),
     connect_handler_(*this),
@@ -45,17 +43,17 @@ void Stream::set_endpoint(const ::network::uri& uri) {
     if (path.empty()) {
       path = "/";
     }
-    request_.set_path(path.c_str());
+    request.set_path(path.c_str());
   }
   else {
-    request_.set_path("/");
+    request.set_path("/");
   }
 
   if (uri.query()) {
-    request_.set_query(uri.query()->to_string());
+    request.set_query(uri.query()->to_string());
   }
   else {
-    request_.clear_query();
+    request.clear_query();
   }
 }
 
@@ -64,7 +62,8 @@ void Stream::set_endpoint(const std::string& endpoint) {
 }
 
 void Stream::set_delegate(delegate::Interface& delegate) {
-  delegate_ = &delegate;
+  delegate_ = std::addressof(delegate);
+  response.set_delegate(delegate);
 }
 
 void Stream::async_start() {
@@ -180,7 +179,7 @@ void Stream::restart_operation() {
 void Stream::start() {
   BOOST_LOG(log_debug_) << "start";
 
-  response_.clear();
+  response.clear();
 
   const Error error;
   if (stop_condition(error, "start")) {
@@ -228,7 +227,7 @@ void Stream::connect_handler(const Error &error, Resolver::iterator iterator) {
   check_in_progress();
 
   BOOST_LOG(log_info_) << "write request";
-  request_.async_write(socket_, connect_manager_.host(), write_handler_);
+  request.async_write(socket_, connect_manager_.host(), write_handler_);
 }
 
 void Stream::write_handler(const Error &error, std::size_t bytes_transferred) {
@@ -242,9 +241,9 @@ void Stream::write_handler(const Error &error, std::size_t bytes_transferred) {
   check_in_progress();
 
   // number of writen bytes must be equals to request size
-  request_.verify_size_on_write_done(bytes_transferred);
+  request.verify_size_on_write_done(bytes_transferred);
 
-  response_.async_read_some(socket_, read_some_handler_);
+  response.async_read_some(socket_, read_some_handler_);
 }
 
 void Stream::read_some_handler(
@@ -261,14 +260,14 @@ void Stream::read_some_handler(
 
   check_in_progress();
 
-  const bool do_stop = response_.on_read(bytes_transferred);
+  const bool do_stop = response.on_read(bytes_transferred);
   if (!do_stop) {
-    response_.async_read_some(socket_, read_some_handler_);
+    response.async_read_some(socket_, read_some_handler_);
     return;
   }
 
   using StatusCode = response::attribute::StatusCode;
-  const StatusCode status_code = response_.header().status_line.status_code;
+  const StatusCode status_code = response.header().status_line.status_code;
   const bool success = (status_code == StatusCode::OK);
   if (!success) {
     BOOST_LOG(log_info_) << "Status code is not OK: " << status_code;

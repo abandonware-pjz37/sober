@@ -19,25 +19,9 @@ class Interface {
   using Iterator = boost::asio::ip::tcp::resolver::iterator;
 
   /**
-    * @note On operation start. Init internal state.
+    * @note On operation start. Init internal state (Stream::async_start)
     */
   virtual void on_start() {
-  }
-
-  /**
-    * @details Do stop on watchdog callback
-    * @note Called when watchdog timer triggered
-    */
-  virtual bool force_stop() {
-    return false;
-  }
-
-  /**
-    * @details Try other connection if not already connected
-    * @note Called when watchdog timer triggered
-    */
-  virtual bool force_reconnect() {
-    return false;
   }
 
   /**
@@ -48,19 +32,42 @@ class Interface {
     return iterator;
   }
 
-  //@{
   /**
-    * @details Do restart if error occurs
-    * @note Called when error occurs
+    * @details Successfull HTTP-response event:
+    * 1. body is ready
+    * 2. status code is OK
     */
-  virtual bool restart_on_error(const boost::system::error_code&) {
-    return false;
+  virtual void on_success() {
   }
 
-  virtual bool restart_on_error(const response::attribute::StatusCode&) {
-    return false;
+  /**
+    * @defgroup HTTP-response body
+    * @{
+    */
+  /**
+    * @details Start writing body
+    */
+  virtual void body_start() {
   }
-  //@}
+
+  /**
+    * @details Body data chunk
+    */
+  virtual void body_write(const char* buffer, std::size_t size) {
+  }
+
+  /**
+    * @details Finish writing body
+    * @note don't mean response is successful (check status code)
+    */
+  virtual void body_finish() {
+  }
+  /** @} */
+
+  /**
+    * @defgroup Watchdog events
+    * @{
+    */
 
   /**
     * @details Watchdog callback period
@@ -70,20 +77,47 @@ class Interface {
   }
 
   /**
+    * @details Do stop on watchdog callback
+    */
+  virtual bool force_stop() {
+    return false;
+  }
+
+  /**
+    * @details Try other connection if not already connected
+    */
+  virtual bool force_reconnect() {
+    return false;
+  }
+
+  /** @} */
+
+  /**
+    * @defgroup Error events
+    * @{
+    */
+
+  /**
     * @details Duration of pause to restart operation
-    * @note Called after restart_on_error (if true returned)
     */
   virtual boost::posix_time::time_duration restart_pause() {
     return boost::posix_time::milliseconds(0);
   }
 
   /**
-    * @details Successfull HTTP-response event:
-    * 1. body is ready
-    * 2. status code is OK
+    * @details Do restart if error occurs
     */
-  virtual void on_success() {
+  virtual bool restart_on_error(const boost::system::error_code&) {
+    return false;
   }
+
+  /**
+    * @details Do restart if error occurs (status code is not OK)
+    */
+  virtual bool restart_on_error(const response::attribute::StatusCode&) {
+    return false;
+  }
+  /** @} */
 };
 
 } // namespace delegate

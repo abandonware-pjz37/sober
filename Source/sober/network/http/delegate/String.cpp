@@ -1,32 +1,35 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <sober/network/http/sink/String.hpp>
+#include <sober/network/http/delegate/String.hpp>
 
 #include <exception> // std::runtime_error
 
 namespace sober {
 namespace network {
 namespace http {
-namespace sink {
+namespace delegate {
 
 String::String() noexcept {
-  clear();
 }
 
-void String::clear() noexcept {
+void String::body_start() noexcept {
   ready_ = false;
   body_.clear();
 }
 
-void String::write(const char* buffer, std::size_t size, bool finish) {
+void String::body_write(const char* buffer, std::size_t size) {
   if (ready()) {
     throw std::runtime_error("Already finished");
   }
   body_.append(buffer, size);
-  if (finish) {
-    ready_ = true;
+}
+
+void String::body_finish() {
+  if (ready()) {
+    throw std::runtime_error("Unexpected body_finish");
   }
+  ready_ = true;
 }
 
 bool String::ready() const noexcept {
@@ -40,7 +43,7 @@ const std::string& String::body() const {
   return body_;
 }
 
-} // namespace sink
+} // namespace delegate
 } // namespace http
 } // namespace network
 } // namespace sober
