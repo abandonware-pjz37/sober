@@ -5,19 +5,24 @@ cmake_minimum_required(VERSION 3.0)
 project(Sober)
 
 ### Build Options ###
-option(SOBER_RUN_LONG_TESTS "Run long unit tests" OFF)
+option(SOBER_BUILD_TESTS "Build unit tests" OFF)
+option(SOBER_BUILD_LONG_TESTS "Build long unit tests" OFF)
+option(SOBER_BUILD_EXAMPLES "Build examples" OFF)
 
 ### Download dependencies ###
 include(HunterGate.cmake)
 hunter_add_package(Boost COMPONENTS thread system log)
 hunter_add_package(CppNetlibUri)
+hunter_add_package(GTest)
+hunter_add_package(JsonSpirit)
 hunter_add_package(Sugar)
 
 ### Find dependencies ###
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED thread system log log_setup)
-find_package(GTest CONFIG REQUIRED)
 find_package(CppNetlibUri CONFIG REQUIRED)
+find_package(GTest CONFIG REQUIRED)
+find_package(JsonSpirit CONFIG REQUIRED)
 
 ### - ###
 include("${SUGAR_ROOT}/cmake/Sugar")
@@ -29,6 +34,8 @@ include(sugar_include)
 #   SOBER_SOURCES
 #   SOBER_UT_SOURCES
 #   SOBER_LONG_UT_SOURCES
+#   SOBER_EXAMPLE_SOURCES
+sugar_include("./Source/example")
 sugar_include("./Source/sober")
 
 list(APPEND SOBER_SOURCES ${SUGAR_SOURCES}) # append used cmake modules
@@ -41,12 +48,22 @@ sugar_groups_generate(${SOBER_LONG_UT_SOURCES})
 ### Targets ###
 add_library(sober ${SOBER_SOURCES})
 
-add_executable(sober_ut ${SOBER_UT_SOURCES})
-target_link_libraries(sober_ut sober GTest::main)
+if(SOBER_BUILD_TESTS)
+  add_executable(sober_ut ${SOBER_UT_SOURCES})
+  target_link_libraries(sober_ut sober GTest::main)
+endif()
 
-if(SOBER_RUN_LONG_TESTS)
+if(SOBER_BUILD_LONG_TESTS)
   add_executable(sober_long_ut ${SOBER_LONG_UT_SOURCES})
   target_link_libraries(sober_long_ut sober GTest::main)
+endif()
+
+if(SOBER_BUILD_EXAMPLES)
+  foreach(src ${SOBER_EXAMPLE_SOURCES})
+    get_filename_component(test_name "${src}" NAME_WE)
+    add_executable(example_${test_name} "${src}")
+    target_link_libraries(example_${test_name} sober)
+  endforeach()
 endif()
 
 set(INCL_DEST "include")
@@ -72,11 +89,13 @@ if(is_ios)
 endif()
 
 target_include_directories(sober SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
-target_link_libraries(sober PUBLIC ${Boost_LIBRARIES} network-uri)
+target_link_libraries(sober PUBLIC ${Boost_LIBRARIES} network-uri json)
 
 ### Testing ###
 enable_testing()
-sugar_add_gtest(SoberUt sober_ut)
+if(TARGET sober_ut)
+  sugar_add_gtest(SoberUt sober_ut)
+endif()
 if(TARGET sober_long_ut)
   sugar_add_gtest(SoberLongUt sober_long_ut)
 endif()
@@ -84,7 +103,6 @@ endif()
 ### Install ###
 set(CONF_DEST "lib/cmake/Sober")
 set(LIBR_DEST "lib")
-set(INCL_DEST "include")
 
 include(CMakePackageConfigHelpers)
 set(sober_config "${CMAKE_CURRENT_BINARY_DIR}/SoberConfig.cmake")
