@@ -12,4 +12,5 @@ include(sugar_files)
 sugar_files(
     SOBER_EXAMPLE_SOURCES
     empty.cpp
+    openweathermap.cpp
 )
