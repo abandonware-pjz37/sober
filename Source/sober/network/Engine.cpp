@@ -10,21 +10,17 @@ namespace sober {
 namespace network {
 
 Engine::Engine():
-    log_debug_(*this, log::Severity::DEBUG),
+    log_("sober.network.Engine", this),
     resolver_(io_service) {
 }
 
 void Engine::run() {
-  BOOST_LOG(log_debug_) << "run";
+  BOOST_LOG(log_.debug) << "run";
 
   // If 'run' called twice 'reset' need to be called between
   io_service.reset();
 
   io_service.run();
-}
-
-const char* Engine::log_name() const {
-  return "sober.network.Engine";
 }
 
 } // namespace network

@@ -45,8 +45,6 @@ class Response {
 
   const response::attribute::Header& header() const;
 
-  const char* log_name() const noexcept;
-
  private:
   friend class ::sober::network::http::unittest::Response;
 
@@ -67,8 +65,7 @@ class Response {
 
   delegate::Interface* delegate_;
 
-  log::Logger log_info_;
-  log::Logger log_debug_;
+  log::Logger log_;
 
   std::size_t buffer_size_;
 

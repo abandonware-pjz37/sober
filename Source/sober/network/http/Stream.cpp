@@ -17,9 +17,7 @@ namespace network {
 namespace http {
 
 Stream::Stream(Engine& engine):
-    log_debug_(*this, log::Severity::DEBUG),
-    log_info_(*this, log::Severity::INFO),
-    log_error_(*this, log::Severity::ERROR),
+    log_("sober.network.http.Stream", this),
     delegate_(nullptr),
     socket_(engine.io_service),
     in_progress_(false),
@@ -67,7 +65,7 @@ void Stream::set_delegate(delegate::Interface& delegate) {
 }
 
 void Stream::async_start() {
-  BOOST_LOG(log_debug_) << "async start";
+  BOOST_LOG(log_.debug) << "async start";
 
   if (delegate_ != nullptr) {
     delegate_->on_start();
@@ -90,7 +88,7 @@ void Stream::async_start() {
 }
 
 void Stream::cancel() {
-  BOOST_LOG(log_info_) << "cancel";
+  BOOST_LOG(log_.info) << "cancel";
 
   force_stop_ = true;
   in_progress_ = false;
@@ -107,10 +105,6 @@ const Statistic& Stream::statistic() const noexcept {
 
 void Stream::clear_statistic() noexcept {
   statistic_.clear();
-}
-
-const char* Stream::log_name() const noexcept {
-  return "sober.network.http.Stream";
 }
 
 void Stream::check_not_in_progress() {
@@ -131,11 +125,11 @@ bool Stream::stop_condition(const Error& error, const char* operation) {
   }
 
   if (force_stop_) {
-    BOOST_LOG(log_info_) << "force stop (operation: " << operation << ")";
+    BOOST_LOG(log_.info) << "force stop (operation: " << operation << ")";
   }
   else {
     assert(error);
-    BOOST_LOG(log_error_) << "operation `" << operation << "` failed: " <<
+    BOOST_LOG(log_.error) << "operation `" << operation << "` failed: " <<
         error.message();
 
     if ((delegate_ != nullptr) && delegate_->restart_on_error(error)) {
@@ -153,7 +147,7 @@ void Stream::restart_operation() {
   assert(!force_stop_);
   assert(delegate_ != nullptr);
 
-  BOOST_LOG(log_info_) << "restart operation";
+  BOOST_LOG(log_.info) << "restart operation";
   statistic_.on_restart();
 
   // Note: Do not start operation synchronously.
@@ -177,7 +171,7 @@ void Stream::restart_operation() {
 }
 
 void Stream::start() {
-  BOOST_LOG(log_debug_) << "start";
+  BOOST_LOG(log_.debug) << "start";
 
   response.clear();
 
@@ -196,10 +190,10 @@ void Stream::resolve_handler(const Error &error, Resolver::iterator iterator) {
   }
 
   if (!connect_manager_.is_connected()) {
-    BOOST_LOG(log_info_) << "resolved:";
+    BOOST_LOG(log_.info) << "resolved:";
     int i = 1;
     for (Resolver::iterator it = iterator; it != Resolver::iterator(); it++) {
-      BOOST_LOG(log_info_) << "  " << i << ": " << it->endpoint();
+      BOOST_LOG(log_.info) << "  " << i << ": " << it->endpoint();
       ++i;
     }
 
@@ -217,7 +211,7 @@ void Stream::connect_handler(const Error &error, Resolver::iterator iterator) {
     if (error != boost::asio::error::operation_aborted) {
       // do not clear resolved cache if operation cancelled by user,
       // just try to get another iterator
-      BOOST_LOG(log_info_) << "clear resolved";
+      BOOST_LOG(log_.info) << "clear resolved";
       connect_manager_.clear_resolved();
     }
     return;
@@ -226,7 +220,7 @@ void Stream::connect_handler(const Error &error, Resolver::iterator iterator) {
   connect_manager_.on_successful_connect(iterator);
   check_in_progress();
 
-  BOOST_LOG(log_info_) << "write request";
+  BOOST_LOG(log_.info) << "write request";
   request.async_write(socket_, connect_manager_.host(), write_handler_);
 }
 
@@ -236,7 +230,7 @@ void Stream::write_handler(const Error &error, std::size_t bytes_transferred) {
     return;
   }
 
-  BOOST_LOG(log_info_) << "write done (" << bytes_transferred << " bytes)";
+  BOOST_LOG(log_.info) << "write done (" << bytes_transferred << " bytes)";
 
   check_in_progress();
 
@@ -250,7 +244,7 @@ void Stream::read_some_handler(
     const Error &error, std::size_t bytes_transferred
 ) {
   if (!error) {
-    BOOST_LOG(log_debug_) << bytes_transferred << " bytes read";
+    BOOST_LOG(log_.debug) << bytes_transferred << " bytes read";
   }
 
   if (stop_condition(error, "read")) {
@@ -270,9 +264,9 @@ void Stream::read_some_handler(
   const StatusCode status_code = response.header().status_line.status_code;
   const bool success = (status_code == StatusCode::OK);
   if (!success) {
-    BOOST_LOG(log_info_) << "Status code is not OK: " << status_code;
+    BOOST_LOG(log_.info) << "Status code is not OK: " << status_code;
     if ((delegate_ != nullptr) && delegate_->restart_on_error(status_code)) {
-      BOOST_LOG(log_info_) << "restart operation (status code)";
+      BOOST_LOG(log_.info) << "restart operation (status code)";
       return restart_operation();
     }
   }
@@ -282,7 +276,7 @@ void Stream::read_some_handler(
 
   watchdog_timer_.cancel();
 
-  BOOST_LOG(log_info_) << "read done (" << bytes_transferred << " bytes)";
+  BOOST_LOG(log_.info) << "read done (" << bytes_transferred << " bytes)";
 
   if (delegate_ != nullptr && success) {
     delegate_->on_success();
@@ -303,7 +297,7 @@ void Stream::watchdog_handler() {
         !connect_manager_.is_connected();
 
     if (can_start_reconnect && delegate_->force_reconnect()) {
-      BOOST_LOG(log_info_) << "force reconnect";
+      BOOST_LOG(log_.info) << "force reconnect";
       statistic_.on_reconnect();
       socket_.close();
     }

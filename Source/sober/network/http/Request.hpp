@@ -43,13 +43,10 @@ class Request {
   void async_write(Socket& socket, const std::string& host, Handler&& handler);
   void verify_size_on_write_done(std::size_t bytes_transferred) const;
 
-  const char* log_name() const;
-
  private:
   void fill_streambuf(const std::string& host);
 
-  log::Logger log_info_;
-  log::Logger log_debug_;
+  log::Logger log_;
 
   boost::asio::streambuf request_;
 

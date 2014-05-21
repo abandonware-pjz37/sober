@@ -15,8 +15,7 @@ namespace http {
 
 Response::Response():
     delegate_(nullptr),
-    log_info_(*this, log::Severity::INFO),
-    log_debug_(*this, log::Severity::DEBUG),
+    log_("sober.network.http.Response", this),
     buffer_size_(DEFAULT_BUFFER_SIZE) {
 }
 
@@ -34,14 +33,14 @@ bool Response::on_read(std::size_t bytes_transferred) noexcept {
   buffer_.commit(bytes_transferred);
 
   if (buffer_.size() == 0) {
-    BOOST_LOG(log_debug_) << "Need more data (buffer is empty)";
+    BOOST_LOG(log_.debug) << "Need more data (buffer is empty)";
     return false;
   }
 
   assert(buffer_.size() > 0);
 
   if (!header_parsed_) {
-    BOOST_LOG(log_debug_) << "Try parse:" << std::endl <<
+    BOOST_LOG(log_.debug) << "Try parse:" << std::endl <<
         std::string(data_ptr(), data_ptr() + buffer_.size());
 
     const std::size_t len = parse(header_grammar_, header_);
@@ -49,7 +48,7 @@ bool Response::on_read(std::size_t bytes_transferred) noexcept {
 
     const char* message =
         header_parsed_ ?  "Header successfully parsed" : "Header parse failed";
-    BOOST_LOG(log_debug_) << message;
+    BOOST_LOG(log_.debug) << message;
 
     if (!header_parsed_) {
       // Need more data (TODO: or incorrect response?)
@@ -141,10 +140,6 @@ const response::attribute::Header& Response::header() const {
     throw std::runtime_error("Header not parsed");
   }
   return header_;
-}
-
-const char* Response::log_name() const noexcept {
-  return "sober.network.http.Response";
 }
 
 Response::Iterator Response::data_ptr() const noexcept {

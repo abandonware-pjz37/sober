@@ -15,8 +15,7 @@ namespace http {
 
 ConnectManager::ConnectManager(Engine& engine):
     engine_(engine),
-    log_info_(*this, log::Severity::INFO),
-    log_debug_(*this, log::Severity::DEBUG) {
+    log_("sober.network.http.ConnectManager", this) {
 }
 
 void ConnectManager::set_endpoint(const ::network::uri& uri) {
@@ -30,10 +29,10 @@ void ConnectManager::set_endpoint(const ::network::uri& uri) {
     resolver_iterator_ = Iterator();
     connected_iterator_ = Iterator();
 
-    BOOST_LOG(log_info_) << "host:" << host_ << ", port:" << port_;
+    BOOST_LOG(log_.info) << "host:" << host_ << ", port:" << port_;
   }
 
-  BOOST_LOG(log_debug_) << "host:" << host_ << ", port:" << port_;
+  BOOST_LOG(log_.debug) << "host:" << host_ << ", port:" << port_;
 
   if (host_.empty()) {
     throw std::runtime_error("Stream::set_endpoint host empty");
@@ -45,14 +44,14 @@ void ConnectManager::set_endpoint(const ::network::uri& uri) {
 }
 
 void ConnectManager::clear_resolved() {
-  BOOST_LOG(log_info_) << "clear resolved";
+  BOOST_LOG(log_.info) << "clear resolved";
   resolver_iterator_ = Iterator();
   connected_iterator_ = Iterator();
   assert(!is_resolved()); // sanity check
 }
 
 void ConnectManager::clear_connected() {
-  BOOST_LOG(log_info_) << "clear connected";
+  BOOST_LOG(log_.info) << "clear connected";
   connected_iterator_ = Iterator();
   assert(!is_connected()); // sanity check
 }
@@ -62,7 +61,7 @@ void ConnectManager::on_successful_connect(Iterator iterator) {
     return;
   }
   connected_iterator_ = iterator;
-  BOOST_LOG(log_info_) << "connected to: " << connected_iterator_->endpoint();
+  BOOST_LOG(log_.info) << "connected to: " << connected_iterator_->endpoint();
 }
 
 const std::string& ConnectManager::host() const {
@@ -78,10 +77,6 @@ bool ConnectManager::is_connected() const {
 
 bool ConnectManager::is_resolved() const {
   return resolver_iterator_ != Iterator();
-}
-
-const char* ConnectManager::log_name() const {
-  return "sober.network.http.ConnectManager";
 }
 
 std::string ConnectManager::get_port(const ::network::uri &uri) {

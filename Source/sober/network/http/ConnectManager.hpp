@@ -44,15 +44,12 @@ class ConnectManager {
   bool is_resolved() const;
   bool is_connected() const;
 
-  const char* log_name() const;
-
  private:
   static std::string get_port(const ::network::uri& uri);
 
   Engine& engine_;
 
-  log::Logger log_info_;
-  log::Logger log_debug_;
+  log::Logger log_;
 
   std::string host_;
   std::string port_;

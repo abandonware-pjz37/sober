@@ -33,10 +33,8 @@ class Engine {
     */
   boost::asio::io_service io_service;
 
-  const char* log_name() const;
-
  private:
-  log::Logger log_debug_;
+  log::Logger log_;
   Resolver resolver_;
 };
 

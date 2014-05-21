@@ -94,8 +94,6 @@ class Stream {
   void clear_statistic() noexcept;
   //@}
 
-  const char* log_name() const noexcept;
-
   Request request;
   Response response;
 
@@ -235,9 +233,7 @@ class Stream {
   void read_some_handler(const Error& error, std::size_t bytes_transferred);
   void watchdog_handler();
 
-  log::Logger log_debug_;
-  log::Logger log_info_;
-  log::Logger log_error_;
+  log::Logger log_;
   delegate::Interface* delegate_;
   boost::asio::ip::tcp::socket socket_;
 

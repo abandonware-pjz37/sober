@@ -17,13 +17,13 @@ template <class Handler>
 void ConnectManager::resolve(Handler handler) {
   if (resolver_iterator_ != Iterator()) {
     // If already resolved (iterator is valid), call handler immediatelly
-    BOOST_LOG(log_debug_) << "already resolved";
+    BOOST_LOG(log_.debug) << "already resolved";
     const Error error;
     handler(error, resolver_iterator_);
     return;
   }
 
-  BOOST_LOG(log_info_) << "resolve host:" << host_ << ", port:" << port_;
+  BOOST_LOG(log_.info) << "resolve host:" << host_ << ", port:" << port_;
   engine_.async_resolve(host(), port_, handler);
 }
 
@@ -35,22 +35,22 @@ void ConnectManager::connect(
     resolver_iterator_ = iterator;
     connected_iterator_ = Iterator();
 
-    BOOST_LOG(log_info_) << "try connect to: ";
+    BOOST_LOG(log_.info) << "try connect to: ";
     int i = 1;
     for (Iterator it = iterator; it != Iterator(); ++it, ++i) {
-      BOOST_LOG(log_info_) << "  " << i << ": " << it->endpoint();
+      BOOST_LOG(log_.info) << "  " << i << ": " << it->endpoint();
     }
   }
 
   if (connected_iterator_ != Iterator()) {
     // If already connected (iterator is valid), call handler immediatelly
-    BOOST_LOG(log_debug_) << "already connected";
+    BOOST_LOG(log_.debug) << "already connected";
     const Error error;
     handler(error, connected_iterator_);
     return;
   }
 
-  BOOST_LOG(log_info_) << "start connect";
+  BOOST_LOG(log_.info) << "start connect";
   boost::asio::async_connect(socket, iterator, handler);
 }
 

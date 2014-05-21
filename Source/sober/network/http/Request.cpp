@@ -13,19 +13,18 @@ namespace network {
 namespace http {
 
 Request::Request():
-    log_info_(*this, log::Severity::INFO),
-    log_debug_(*this, log::Severity::DEBUG),
+    log_("sober.network.http.Request", this),
     method_(to_const_char(request::Method::GET)) {
 }
 
 void Request::set_method(request::Method method) {
   method_ = to_const_char(method);
-  BOOST_LOG(log_info_) << "method: " << method_;
+  BOOST_LOG(log_.info) << "method: " << method_;
 }
 
 void Request::set_path(const char *path) {
   path_ = path;
-  BOOST_LOG(log_info_) << "path: " << path_;
+  BOOST_LOG(log_.info) << "path: " << path_;
 }
 
 void Request::set_query(const char *key, const std::string& value) {
@@ -37,7 +36,7 @@ void Request::set_query(const char *key, const std::string& value) {
      value.begin(), value.end(), std::back_inserter(query_)
   );
 
-  BOOST_LOG(log_info_) << "query: `" << query_
+  BOOST_LOG(log_.info) << "query: `" << query_
       << "` (key:" << key << ", value:" << value << ")";
 }
 
@@ -48,12 +47,12 @@ void Request::set_query(const std::string& query) {
      query.begin(), query.end(), std::back_inserter(query_)
   );
 
-  BOOST_LOG(log_info_) << "query: " << query_;
+  BOOST_LOG(log_.info) << "query: " << query_;
 }
 
 void Request::clear_query() {
   query_.clear();
-  BOOST_LOG(log_info_) << "clear query";
+  BOOST_LOG(log_.info) << "clear query";
 }
 
 void Request::verify_size_on_write_done(std::size_t bytes_transferred) const {
@@ -65,12 +64,8 @@ void Request::verify_size_on_write_done(std::size_t bytes_transferred) const {
   }
 }
 
-const char* Request::log_name() const {
-  return "sober.network.http.Request";
-}
-
 void Request::fill_streambuf(const std::string& host) {
-  BOOST_LOG(log_info_) << "host:" << host;
+  BOOST_LOG(log_.info) << "host:" << host;
 
   request_.consume(request_.size()); // clear
   std::ostream os(&request_);
@@ -94,7 +89,7 @@ void Request::fill_streambuf(const std::string& host) {
   const char* begin = boost::asio::buffer_cast<const char*>(buffers);
   const std::size_t size = boost::asio::buffer_size(buffers);
 
-  BOOST_LOG(log_debug_) << std::endl << std::string(begin, begin + size);
+  BOOST_LOG(log_.debug) << std::endl << std::string(begin, begin + size);
 }
 
 } // namespace http
