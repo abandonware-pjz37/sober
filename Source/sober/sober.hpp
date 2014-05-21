@@ -16,12 +16,13 @@
 #include <sober/network/http/Request.ipp>
 #include <sober/network/http/Response.hpp>
 #include <sober/network/http/Response.ipp>
-#include <sober/network/http/Sink.hpp>
 #include <sober/network/http/Statistic.hpp>
 #include <sober/network/http/Stream.hpp>
 #include <sober/network/http/delegate/Interface.hpp>
+#include <sober/network/http/delegate/Json.hpp>
 #include <sober/network/http/delegate/Reconnect.hpp>
 #include <sober/network/http/delegate/Retry.hpp>
+#include <sober/network/http/delegate/String.hpp>
 #include <sober/network/http/delegate/Timeout.hpp>
 #include <sober/network/http/request/Method.hpp>
 #include <sober/network/http/response/attribute/ChunkSize.hpp>
@@ -49,7 +50,6 @@
 #include <sober/network/http/response/grammar/TEXT.hpp>
 #include <sober/network/http/response/grammar/TransferEncoding.hpp>
 #include <sober/network/http/response/grammar/common.hpp>
-#include <sober/network/http/sink/String.hpp>
 #include <sober/utils/Test.hpp>
 #include <sober/utils/run_duration.hpp>
 

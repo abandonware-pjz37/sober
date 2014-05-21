@@ -17,7 +17,7 @@ class String: virtual public Interface {
  public:
   String() noexcept;
 
-  void body_start() noexcept override;
+  virtual void body_start() noexcept override;
 
   /**
     * @throws @c std::runtime_error if already finished

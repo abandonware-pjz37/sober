@@ -13,6 +13,8 @@ sugar_files(
     SOBER_SOURCES
     Interface.fpp
     Interface.hpp
+    Json.cpp
+    Json.hpp
     Reconnect.cpp
     Reconnect.hpp
     Retry.cpp
