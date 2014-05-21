@@ -165,6 +165,34 @@ TEST_F(Response, chunked_real) {
   );
 }
 
+TEST_F(Response, chunked_fail) {
+  std::string message(
+      "HTTP/1.1 200 OK\r\n"
+      "Server: nginx\r\n"
+      "Date: Wed, 21 May 2014 10:56:04 GMT\r\n"
+      "Content-Type: application/json; charset=utf-8\r\n"
+      "Transfer-Encoding: chunked\r\n"
+      "Connection: keep-alive\r\n"
+      "Access-Control-Allow-Origin: *\r\n"
+      "Access-Control-Allow-Credentials: true\r\n"
+      "Access-Control-Allow-Methods: GET, POST\r\n"
+      "\r\n"
+      "1e4\r\n"
+      "{\"coord\":{\"lon\":-74.26,\"lat\":4.73},"
+      "\"sys\":{\"message\":0.0092,\"country\":\"CO\","
+      "\"sunrise\":1400668981,\"sunset\":1400713462},"
+      "\"weather\":[{\"id\":804,\"main\":\"Clouds\","
+      "\"description\":\"overcast clouds\",\"icon\":\"04n\"}],"
+      "\"base\":\"cmc stations\",\"m"
+  );
+
+  delegate::String delegate;
+
+  ASSERT_FALSE(delegate.ready());
+  ASSERT_THROW(make_response(message, delegate), std::runtime_error);
+  ASSERT_FALSE(delegate.ready());
+}
+
 } // namespace unittest
 } // namespace http
 } // namespace network

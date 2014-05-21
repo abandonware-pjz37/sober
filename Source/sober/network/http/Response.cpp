@@ -48,7 +48,7 @@ bool Response::on_read(std::size_t bytes_transferred) noexcept {
     header_parsed_ = (len != 0);
 
     const char* message =
-        header_parsed_ ?  "Successfully parsed" : "Header parse failed";
+        header_parsed_ ?  "Header successfully parsed" : "Header parse failed";
     BOOST_LOG(log_debug_) << message;
 
     if (!header_parsed_) {

@@ -17,7 +17,7 @@ namespace delegate {
 class Json: public String {
  public:
   using Base = String;
-  
+
   virtual void body_start() noexcept override;
 
   /**
