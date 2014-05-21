@@ -10,6 +10,7 @@
 #include <sober/log/attributes.hpp>
 #include <sober/network/Engine.hpp>
 #include <sober/network/Engine.ipp>
+#include <sober/network/api/OpenWeatherMap.hpp>
 #include <sober/network/http/ConnectManager.hpp>
 #include <sober/network/http/ConnectManager.ipp>
 #include <sober/network/http/Request.hpp>

@@ -10,6 +10,7 @@ endif()
 include(sugar_files)
 include(sugar_include)
 
+sugar_include(api)
 sugar_include(http)
 sugar_include(unittest)
 

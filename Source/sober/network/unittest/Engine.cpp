@@ -21,23 +21,24 @@ class Engine: public utils::Test {
  public:
   Engine():
       stream_(engine_) {
-    stream_.set_delegate(delegate_);
   }
 
  protected:
   network::Engine engine_;
-  http::delegate::String delegate_;
   network::http::Stream stream_;
 };
 
 TEST_F(Engine, simple) {
+  http::delegate::String delegate;
+  stream_.set_delegate(delegate);
+
   stream_.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
   stream_.async_start();
 
   engine_.run();
 
-  ASSERT_TRUE(delegate_.ready());
-  ASSERT_STREQ(delegate_.body().c_str(), "Hello, request!");
+  ASSERT_TRUE(delegate.ready());
+  ASSERT_STREQ(delegate.body().c_str(), "Hello, request!");
   ASSERT_EQ(
       stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
@@ -45,22 +46,25 @@ TEST_F(Engine, simple) {
 }
 
 TEST_F(Engine, simple_twice) {
+  http::delegate::String delegate;
+  stream_.set_delegate(delegate);
+
   stream_.set_endpoint("http://pastebin.com/raw.php?i=A8wzq8s3");
   stream_.async_start();
   engine_.run();
-  ASSERT_TRUE(delegate_.ready());
-  ASSERT_STREQ(delegate_.body().c_str(), "Hello, request!");
+  ASSERT_TRUE(delegate.ready());
+  ASSERT_STREQ(delegate.body().c_str(), "Hello, request!");
   ASSERT_EQ(
       stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
   );
 
   stream_.async_start();
-  ASSERT_FALSE(delegate_.ready());
+  ASSERT_FALSE(delegate.ready());
 
   engine_.run();
-  ASSERT_TRUE(delegate_.ready());
-  ASSERT_STREQ(delegate_.body().c_str(), "Hello, request!");
+  ASSERT_TRUE(delegate.ready());
+  ASSERT_STREQ(delegate.body().c_str(), "Hello, request!");
   ASSERT_EQ(
       stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
@@ -68,6 +72,9 @@ TEST_F(Engine, simple_twice) {
 }
 
 TEST_F(Engine, simple_query) {
+  http::delegate::String delegate;
+  stream_.set_delegate(delegate);
+
   stream_.set_endpoint("http://pastebin.com/raw.php");
   stream_.request.set_query("i", "A8wzq8s3");
   stream_.async_start();
@@ -80,8 +87,8 @@ TEST_F(Engine, simple_query) {
 
   ASSERT_LT(ch::duration_cast<ch::seconds>(duration).count(), 2);
 
-  ASSERT_TRUE(delegate_.ready());
-  ASSERT_STREQ(delegate_.body().c_str(), "Hello, request!");
+  ASSERT_TRUE(delegate.ready());
+  ASSERT_STREQ(delegate.body().c_str(), "Hello, request!");
   ASSERT_EQ(
       stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
@@ -89,6 +96,9 @@ TEST_F(Engine, simple_query) {
 }
 
 TEST_F(Engine, multiple_query) {
+  http::delegate::String delegate;
+  stream_.set_delegate(delegate);
+
   stream_.set_endpoint("http://pastebin.com/raw.php");
 
   // first request
@@ -96,8 +106,8 @@ TEST_F(Engine, multiple_query) {
   stream_.async_start();
   engine_.run();
 
-  ASSERT_TRUE(delegate_.ready());
-  ASSERT_STREQ(delegate_.body().c_str(), "Hello, request!");
+  ASSERT_TRUE(delegate.ready());
+  ASSERT_STREQ(delegate.body().c_str(), "Hello, request!");
   ASSERT_EQ(
       stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
@@ -108,8 +118,8 @@ TEST_F(Engine, multiple_query) {
   stream_.async_start();
   engine_.run();
 
-  ASSERT_TRUE(delegate_.ready());
-  ASSERT_STREQ(delegate_.body().c_str(), "! One more time");
+  ASSERT_TRUE(delegate.ready());
+  ASSERT_STREQ(delegate.body().c_str(), "! One more time");
   ASSERT_EQ(
       stream_.response.header().status_line.status_code,
       http::response::attribute::StatusCode::OK
@@ -130,8 +140,6 @@ TEST_F(Engine, operation_timeout) {
   );
 
   ASSERT_LT(ch::duration_cast<ch::seconds>(duration).count(), 3);
-  ASSERT_FALSE(delegate_.ready());
-  ASSERT_THROW(delegate_.body(), std::runtime_error);
 }
 
 TEST_F(Engine, retry_on_error) {
@@ -152,6 +160,7 @@ TEST_F(Engine, retry_on_error) {
 
 TEST_F(Engine, retry_with_timeout) {
   const unsigned retry_number = 2;
+  using StatusCode = http::response::attribute::StatusCode;
 
   class RetryWithTimeout:
       public http::delegate::Retry,
@@ -175,11 +184,6 @@ TEST_F(Engine, retry_with_timeout) {
   engine_.run();
 
   ASSERT_EQ(stream_.statistic().get_restarted(), retry_number);
-  ASSERT_TRUE(delegate_.ready());
-  ASSERT_EQ(
-      stream_.response.header().status_line.status_code,
-      http::response::attribute::StatusCode::NOT_FOUND
-  );
 }
 
 TEST_F(Engine, default_delegate) {
