@@ -4,24 +4,36 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
+#include <sober/network/http/Stream.fpp>
 #include <sober/network/http/delegate/Json.hpp>
 
 namespace sober {
 namespace network {
 namespace api {
 
+// http://bugs.openweathermap.org/projects/api/wiki/Weather_Data
 class OpenWeatherMap : public http::delegate::Json {
  public:
   using Base = http::delegate::Json;
 
+  OpenWeatherMap(http::Stream&);
+
   struct Attribute {
     double longitude;
     double latitude;
+    double temperature;
+    std::string temperature_human;
     std::string description;
     std::string icon;
 
     void fill(const ciere::json::value&);
+
+   private:
+    std::ostringstream str_;
   };
+
+  void async_get_city(const char* city);
+  void async_get_city(const std::string& city);
 
   virtual void body_start() noexcept override;
   virtual void on_success() override;
@@ -29,6 +41,8 @@ class OpenWeatherMap : public http::delegate::Json {
   const Attribute& attribute() const noexcept;
 
  private:
+  http::Stream& stream_;
+
   bool valid_;
   Attribute attribute_;
 };

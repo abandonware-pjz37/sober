@@ -27,8 +27,14 @@ void Request::set_path(const char *path) {
   BOOST_LOG(log_.info) << "path: " << path_;
 }
 
-void Request::set_query(const char *key, const std::string& value) {
-  query_ = "?";
+void Request::add_query(const char *key, const std::string& value) {
+  if (query_.empty()) {
+    query_ = "?";
+  }
+  else {
+    query_ += "&";
+  }
+
   query_ += key;
   query_ += "=";
 
@@ -38,6 +44,11 @@ void Request::set_query(const char *key, const std::string& value) {
 
   BOOST_LOG(log_.info) << "query: `" << query_
       << "` (key:" << key << ", value:" << value << ")";
+}
+
+void Request::set_query(const char* key, const std::string& value) {
+  clear_query();
+  add_query(key, value);
 }
 
 void Request::set_query(const std::string& query) {

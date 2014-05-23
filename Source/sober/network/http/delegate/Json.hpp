@@ -5,8 +5,8 @@
 // All rights reserved.
 
 #include <ciere/json/value.hpp>
+#include <sober/log/Logger.hpp>
 #include <sober/network/http/delegate/String.hpp>
-
 #include <string>
 
 namespace sober {
@@ -17,6 +17,8 @@ namespace delegate {
 class Json: public String {
  public:
   using Base = String;
+
+  Json();
 
   virtual void body_start() noexcept override;
 
@@ -31,6 +33,7 @@ class Json: public String {
   const ciere::json::value& json() const;
 
  private:
+  log::Logger log_;
   bool valid_;
   ciere::json::value json_;
 };

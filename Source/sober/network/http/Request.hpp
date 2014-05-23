@@ -35,7 +35,20 @@ class Request {
   void set_method(request::Method method);
 
   void set_path(const char* path);
+
+  /**
+    * @brief Add key with value, like `("i", "abc")` and `("k", "xyz")`
+    */
+  void add_query(const char* key, const std::string& value);
+
+  /**
+    * @brief clear_query then add_query
+    */
   void set_query(const char* key, const std::string& value);
+
+  /**
+    * @brief Set raw query string, like: `i=abc&k=xyz`
+    */
   void set_query(const std::string& query);
   void clear_query();
 

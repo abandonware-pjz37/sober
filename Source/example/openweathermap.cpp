@@ -3,13 +3,15 @@
 
 #include <sober/sober.hpp>
 
-class Delegate : sober::network::api::OpenWeatherMap {
+class Delegate : public sober::network::api::OpenWeatherMap {
  public:
   using Base = sober::network::api::OpenWeatherMap;
   using StatusCode = sober::network::http::response::attribute::StatusCode;
   using ErrorCode = boost::system::error_code;
 
-  Delegate(): max_count_(10) {
+  Delegate(sober::network::http::Stream& stream):
+      Base(stream),
+      max_count_(10) {
   }
 
   virtual void on_start() override {
@@ -17,13 +19,17 @@ class Delegate : sober::network::api::OpenWeatherMap {
   }
 
   virtual boost::posix_time::time_duration watchdog_period() override {
-    return boost::posix_time::milliseconds(100);
+    return boost::posix_time::milliseconds(1000);
   }
 
   virtual bool force_stop() override {
     ++counter_;
     std::cout << "Count " << counter_ << "/" << max_count_ << std::endl;
-    return counter_ >= max_count_;
+    bool stop = (counter_ >= max_count_);
+    if (stop) {
+      std::cerr << "Timeout reached" << std::endl;
+    }
+    return stop;
   }
 
   virtual void on_success() override {
@@ -35,9 +41,12 @@ class Delegate : sober::network::api::OpenWeatherMap {
       return;
     }
     const Attribute& attr = attribute();
-    std::cout << "OK:" << std::endl;
+    std::cout << "Success..." << std::endl;
     std::cout << "  longitude: " << attr.longitude << std::endl;
     std::cout << "  latitude: " << attr.latitude << std::endl;
+    std::cout << "  temperature: " << attr.temperature << std::endl;
+    std::cout << "  temperature(human): " << attr.temperature_human
+        << std::endl;
     std::cout << "  description: " << attr.description << std::endl;
     std::cout << "  icon: " << attr.icon << std::endl;
   }
@@ -58,26 +67,33 @@ class Delegate : sober::network::api::OpenWeatherMap {
 };
 
 int main() {
-  const bool debug = true;
+  try {
+    const bool debug = false;
 
-  if (debug) {
-    sober::utils::Test::init_logs(true, true);
+    if (debug) {
+      sober::utils::Test::init_logs(true, true);
+    }
+    else {
+      sober::utils::Test::init_logs(false, false);
+    }
+
+    namespace net = sober::network;
+
+    net::Engine engine;
+    net::http::Stream stream(engine);
+
+    Delegate delegate(stream);
+
+    const char* city = "Madrid";
+    std::cout << "City: " << city << std::endl;
+
+    delegate.async_get_city(city);
+
+    engine.run();
+    return Sober::Exit::OK;
   }
-  else {
-    sober::utils::Test::init_logs(false, false);
+  catch (std::exception& exc) {
+    std::cerr << "Exception: " << exc.what() << std::endl;
+    return Sober::Exit::FAIL;
   }
-
-  namespace net = sober::network;
-
-  net::Engine engine;
-  net::http::Stream stream(engine);
-  net::api::OpenWeatherMap delegate;
-
-  stream.set_endpoint("http://api.openweathermap.org/data/2.5/weather");
-  stream.set_delegate(delegate);
-
-  stream.request.set_query("q", "Madrid");
-  stream.async_start();
-
-  engine.run();
 }
