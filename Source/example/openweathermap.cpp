@@ -90,10 +90,10 @@ int main() {
     delegate.async_get_city(city);
 
     engine.run();
-    return Sober::Exit::OK;
+    return sober::Exit::OK;
   }
   catch (std::exception& exc) {
     std::cerr << "Exception: " << exc.what() << std::endl;
-    return Sober::Exit::FAIL;
+    return sober::Exit::FAIL;
   }
 }
