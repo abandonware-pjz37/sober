@@ -10,7 +10,7 @@ namespace network {
 namespace http {
 namespace delegate {
 
-String::String() noexcept {
+String::String() noexcept: ready_(false) {
 }
 
 void String::body_start() noexcept {

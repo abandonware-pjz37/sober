@@ -38,7 +38,10 @@ class OpenWeatherMap : public http::delegate::Json {
   virtual void body_start() noexcept override;
   virtual void on_success() override;
 
-  const Attribute& attribute() const noexcept;
+  /**
+    * @throw @c std::runtime_error if attribute not valid
+    */
+  const Attribute& attribute() const;
 
  private:
   http::Stream& stream_;

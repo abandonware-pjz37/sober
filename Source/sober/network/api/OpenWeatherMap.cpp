@@ -1,8 +1,9 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <iomanip> // std::setprecision
 #include <sober/network/api/OpenWeatherMap.hpp>
+
+#include <iomanip> // std::setprecision
 #include <sober/network/http/Stream.hpp>
 
 namespace sober {
@@ -67,7 +68,7 @@ void OpenWeatherMap::on_success() {
   valid_ = true;
 }
 
-const OpenWeatherMap::Attribute& OpenWeatherMap::attribute() const noexcept {
+const OpenWeatherMap::Attribute& OpenWeatherMap::attribute() const {
   if (!valid_) {
     throw std::runtime_error("OpenWeatherMap attribute not valid");
   }

@@ -8,6 +8,9 @@ else()
 endif()
 
 include(sugar_files)
+include(sugar_include)
+
+sugar_include(unittest)
 
 sugar_files(
     SOBER_SOURCES
