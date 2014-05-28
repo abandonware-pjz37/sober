@@ -3,10 +3,11 @@
 # See manual:
 #     * http://www.cmake.org/cmake/help/v2.8.12/cmake.html#module:CMakePackageConfigHelpers
 
-find_package(GTest CONFIG REQUIRED PATHS @GTest_DIR@ NO_DEFAULT_PATH)
 find_package(
     CppNetlibUri CONFIG REQUIRED PATHS @CppNetlibUri_DIR@ NO_DEFAULT_PATH
 )
+find_package(GTest CONFIG REQUIRED PATHS @GTest_DIR@ NO_DEFAULT_PATH)
+find_package(JsonSpirit CONFIG REQUIRED PATHS @JsonSpirit_DIR@ NO_DEFAULT_PATH)
 
 @PACKAGE_INIT@
 
