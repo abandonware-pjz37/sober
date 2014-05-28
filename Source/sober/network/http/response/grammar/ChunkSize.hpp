@@ -4,6 +4,7 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
+#undef nil // workaround for Obj-C++ (need for fusion::nil)
 #include <boost/spirit/home/qi.hpp>
 
 #include <sober/network/http/response/attribute/ChunkSize.hpp>
