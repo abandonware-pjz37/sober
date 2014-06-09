@@ -5,6 +5,7 @@
 // All rights reserved.
 
 #include <sober/network/http/response/grammar/common.hpp> // qi
+#include <sober/network/http/response/attribute/SP.hpp>
 
 namespace sober {
 namespace network {
@@ -12,16 +13,16 @@ namespace http {
 namespace response {
 namespace grammar {
 
-// 2.2 Basic Rules
+// rfc5234, B.1. Core Rules
 template <class Iterator>
-struct SP: qi::grammar<Iterator, void()> {
-  using Base = qi::grammar<Iterator, void()>;
+struct SP: qi::grammar<Iterator, SP()> {
+  using Base = qi::grammar<Iterator, SP()>;
 
   SP(): Base(sp) {
-    sp = ' ';
+    sp %= ' ';
   }
 
-  qi::rule<Iterator, void()> sp;
+  qi::rule<Iterator, SP()> sp;
 };
 
 } // namespace grammar
