@@ -21,4 +21,5 @@ sugar_files(
     StatusCode.hpp
     StatusLine.hpp
     TransferEncoding.hpp
+    VCHAR.hpp
 )
