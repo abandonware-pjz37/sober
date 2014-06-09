@@ -18,6 +18,7 @@ sugar_files(
     HTAB.hpp
     HTTPVersion.hpp
     LF.hpp
+    ObsText.hpp
     ReasonPhrase.hpp
     SP.hpp
     StatusCode.hpp
