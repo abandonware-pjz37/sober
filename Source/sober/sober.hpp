@@ -41,7 +41,6 @@
 #include <sober/network/http/response/grammar/HTTPVersion.hpp>
 #include <sober/network/http/response/grammar/Header.hpp>
 #include <sober/network/http/response/grammar/LF.hpp>
-#include <sober/network/http/response/grammar/LWS.hpp>
 #include <sober/network/http/response/grammar/ReasonPhrase.hpp>
 #include <sober/network/http/response/grammar/SP.hpp>
 #include <sober/network/http/response/grammar/StatusCode.hpp>

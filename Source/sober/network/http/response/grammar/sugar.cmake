@@ -18,7 +18,6 @@ sugar_files(
     HT.hpp
     HTTPVersion.hpp
     LF.hpp
-    LWS.hpp
     ReasonPhrase.hpp
     SP.hpp
     StatusCode.hpp
