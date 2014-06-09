@@ -37,7 +37,6 @@
 #include <sober/network/http/response/grammar/CRLF.hpp>
 #include <sober/network/http/response/grammar/ChunkSize.hpp>
 #include <sober/network/http/response/grammar/ContentLength.hpp>
-#include <sober/network/http/response/grammar/HT.hpp>
 #include <sober/network/http/response/grammar/HTTPVersion.hpp>
 #include <sober/network/http/response/grammar/Header.hpp>
 #include <sober/network/http/response/grammar/LF.hpp>
