@@ -13,6 +13,7 @@ sugar_files(
     SOBER_SOURCES
     ChunkSize.hpp
     ContentLength.hpp
+    HTAB.hpp
     ReasonPhrase.hpp
     StatusCode.cpp
     StatusCode.fpp

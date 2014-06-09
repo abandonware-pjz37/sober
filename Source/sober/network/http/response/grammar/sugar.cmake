@@ -15,6 +15,7 @@ sugar_files(
     CRLF.hpp
     ChunkSize.hpp
     ContentLength.hpp
+    HTAB.hpp
     HTTPVersion.hpp
     LF.hpp
     ReasonPhrase.hpp
