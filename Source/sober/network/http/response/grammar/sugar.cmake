@@ -13,7 +13,6 @@ sugar_files(
     SOBER_SOURCES
     CR.hpp
     CRLF.hpp
-    CTL.hpp
     ChunkSize.hpp
     ContentLength.hpp
     HT.hpp

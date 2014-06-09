@@ -35,7 +35,6 @@
 #include <sober/network/http/response/attribute/TransferEncoding.hpp>
 #include <sober/network/http/response/grammar/CR.hpp>
 #include <sober/network/http/response/grammar/CRLF.hpp>
-#include <sober/network/http/response/grammar/CTL.hpp>
 #include <sober/network/http/response/grammar/ChunkSize.hpp>
 #include <sober/network/http/response/grammar/ContentLength.hpp>
 #include <sober/network/http/response/grammar/HT.hpp>
