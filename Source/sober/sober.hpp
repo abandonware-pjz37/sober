@@ -32,7 +32,6 @@
 #include <sober/network/http/response/attribute/ReasonPhrase.hpp>
 #include <sober/network/http/response/attribute/StatusCode.hpp>
 #include <sober/network/http/response/attribute/StatusLine.hpp>
-#include <sober/network/http/response/attribute/TEXT.hpp>
 #include <sober/network/http/response/attribute/TransferEncoding.hpp>
 #include <sober/network/http/response/grammar/CR.hpp>
 #include <sober/network/http/response/grammar/CRLF.hpp>
@@ -48,7 +47,6 @@
 #include <sober/network/http/response/grammar/SP.hpp>
 #include <sober/network/http/response/grammar/StatusCode.hpp>
 #include <sober/network/http/response/grammar/StatusLine.hpp>
-#include <sober/network/http/response/grammar/TEXT.hpp>
 #include <sober/network/http/response/grammar/TransferEncoding.hpp>
 #include <sober/network/http/response/grammar/common.hpp>
 #include <sober/utils/Test.hpp>

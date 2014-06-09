@@ -18,6 +18,5 @@ sugar_files(
     StatusCode.fpp
     StatusCode.hpp
     StatusLine.hpp
-    TEXT.hpp
     TransferEncoding.hpp
 )

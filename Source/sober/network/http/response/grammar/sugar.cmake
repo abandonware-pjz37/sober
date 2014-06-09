@@ -24,7 +24,6 @@ sugar_files(
     SP.hpp
     StatusCode.hpp
     StatusLine.hpp
-    TEXT.hpp
     TransferEncoding.hpp
     common.hpp
 )
