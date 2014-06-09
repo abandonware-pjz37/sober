@@ -19,6 +19,9 @@ ConnectManager::ConnectManager(Engine& engine):
 }
 
 void ConnectManager::set_endpoint(const ::network::uri& uri) {
+  if (!uri.host().is_initialized()) {
+    throw std::runtime_error("URI host is empty");
+  }
   const std::string new_host = uri.host()->to_string();
   const std::string new_port = get_port(uri);
 

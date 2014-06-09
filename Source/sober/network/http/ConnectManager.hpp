@@ -27,6 +27,9 @@ class ConnectManager {
 
   ConnectManager(Engine&);
 
+  /**
+    * @throws @c std::runtime_error if @param uri is incorrect
+    */
   void set_endpoint(const ::network::uri& uri);
 
   template <class Handler> void resolve(Handler handler);
