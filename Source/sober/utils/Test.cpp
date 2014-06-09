@@ -4,8 +4,8 @@
 #include <sober/utils/Test.hpp>
 
 #include <boost/log/sinks.hpp>
-#include <boost/log/utility/empty_deleter.hpp>
 #include <boost/log/utility/setup.hpp>
+#include <boost/utility/empty_deleter.hpp>
 #include <fstream> // std::ofstream
 #include <sober/log/attributes.hpp> // sober::log::formatter
 
@@ -25,7 +25,7 @@ void Test::init_logs(bool log_to_cout, bool log_cout_verbose) {
   );
   if (log_to_cout) {
     sink_info->locked_backend()->add_stream(
-        boost::shared_ptr<std::ostream>(&std::cout, boost::log::empty_deleter())
+        boost::shared_ptr<std::ostream>(&std::cout, boost::empty_deleter())
     );
   }
   sink_info->set_formatter(&log::formatter);

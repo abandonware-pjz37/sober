@@ -16,7 +16,7 @@ template <class Handler>
 inline void Response::async_read_some(
     Socket& socket,
     Handler&& handler
-) {
+) noexcept {
   socket.async_read_some(buffer_.prepare(buffer_size_), handler);
 }
 

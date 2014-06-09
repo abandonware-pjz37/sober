@@ -46,6 +46,12 @@ sugar_groups_generate(${SOBER_UT_SOURCES})
 sugar_groups_generate(${SOBER_LONG_UT_SOURCES})
 
 ### Targets ###
+string(COMPARE EQUAL "${CMAKE_CXX_COMPILER_ID}" "Clang" is_clang)
+string(COMPARE EQUAL "${CMAKE_CXX_COMPILER_ID}" "AppleClang" is_apple_clang)
+if(is_clang OR is_apple_clang)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-register")
+endif()
+
 add_library(sober ${SOBER_SOURCES})
 
 if(SOBER_BUILD_TESTS)
