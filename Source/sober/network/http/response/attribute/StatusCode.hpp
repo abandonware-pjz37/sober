@@ -12,13 +12,13 @@ namespace http {
 namespace response {
 namespace attribute {
 
-// 6.1.1 Status Code and Reason Phrase
+// rfc7231, 8.2.3. Registrations
 enum class StatusCode {
-  // 1xx Informational
+  // 6.2 Informational 1xx
   CONTINUE = 100,
   SWITCHING_PROTOCOLS = 101,
   PROCESSING = 102, // rfc2518
-  // 2xx Success
+  // 6.3. Successful 2xx
   OK = 200,
   CREATED = 201,
   ACCEPTED = 202,
@@ -29,7 +29,7 @@ enum class StatusCode {
   MULTI_STATUS = 207, // rfc4918
   ALREADY_REPORTED = 208, // rfc5842
   IM_USED = 226, // rfc3229
-  // 3xx Redirection
+  // 6.4. Redirection 3xx
   MULTIPLE_CHOICES = 300,
   MOVED_PERMANENTLY = 301,
   FOUND = 302,
@@ -39,7 +39,7 @@ enum class StatusCode {
   SWITCH_PROXY = 306,
   TEMPORARY_REDIRECT = 307,
   PERMANENT_REDIRECT = 308,
-  // 4xx Client Error
+  // 6.5. Client Error 4xx
   BAD_REQUEST = 400,
   UNAUTHORIZED = 401,
   PAYMENT_REQUIRED = 402,
@@ -81,7 +81,7 @@ enum class StatusCode {
   NO_CERT = 496,
   HTTP_TO_HTTPS = 497,
   CLIENT_CLOSED_REQUEST = 499,
-  // 5xx Server Error
+  // 6.6. Server Error 5xx
   INTERNAL_SERVER_ERROR = 500,
   NOT_IMPLEMENTED = 501,
   BAD_GATEWAY = 502,

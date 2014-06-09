@@ -18,14 +18,15 @@ namespace http {
 namespace response {
 namespace grammar {
 
-// 6.1 Status-Line
+// rfc7230, 3.1.2. Status-Line
 template <class Iterator>
 struct StatusLine: qi::grammar<Iterator, attribute::StatusLine()> {
   using Base = qi::grammar<Iterator, attribute::StatusLine()>;
 
   StatusLine(): Base(status_line) {
     status_line %=
-        http_version >> sp >> status_code >> sp >> reason_phrase >> crlf;
+        http_version >> qi::omit[sp] >> status_code >> qi::omit[sp] >>
+        reason_phrase >> crlf;
   }
 
   HTTPVersion<Iterator> http_version;

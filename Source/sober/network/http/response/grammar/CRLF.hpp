@@ -13,7 +13,7 @@ namespace http {
 namespace response {
 namespace grammar {
 
-// 2.2 Basic Rules
+// rfc5234, B.1. Core Rules
 template <class Iterator>
 struct CRLF: qi::grammar<Iterator, void()> {
   using Base = qi::grammar<Iterator, void()>;

@@ -4,10 +4,11 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <sober/network/http/response/grammar/TEXT.hpp>
-#include <sober/network/http/response/grammar/CR.hpp>
-#include <sober/network/http/response/grammar/LF.hpp>
 #include <sober/network/http/response/attribute/ReasonPhrase.hpp>
+#include <sober/network/http/response/grammar/HTAB.hpp>
+#include <sober/network/http/response/grammar/ObsText.hpp>
+#include <sober/network/http/response/grammar/SP.hpp>
+#include <sober/network/http/response/grammar/VCHAR.hpp>
 
 namespace sober {
 namespace network {
@@ -15,18 +16,19 @@ namespace http {
 namespace response {
 namespace grammar {
 
-// 6.1.1 Status Code and Reason Phrase
+// rfc7230, 3.1.2. Status Line
 template <class Iterator>
 struct ReasonPhrase: qi::grammar<Iterator, attribute::ReasonPhrase()> {
   using Base = qi::grammar<Iterator, attribute::ReasonPhrase()>;
 
   ReasonPhrase(): Base(reason_phrase) {
-    reason_phrase %= *(text - cr - lf);
+    reason_phrase %= *(htab | sp | vchar | obs_text);
   }
 
-  TEXT<Iterator> text;
-  CR<Iterator> cr;
-  LF<Iterator> lf;
+  HTAB<Iterator> htab;
+  SP<Iterator> sp;
+  VCHAR<Iterator> vchar;
+  ObsText<Iterator> obs_text;
 
   qi::rule<Iterator, attribute::ReasonPhrase()> reason_phrase;
 };

@@ -18,7 +18,7 @@ template <class Iterator>
 struct VCHAR: qi::grammar<Iterator, attribute::VCHAR()> {
   using Base = qi::grammar<Iterator, attribute::VCHAR()>;
 
-  VCHAR(): Base(header) {
+  VCHAR(): Base(vchar) {
     vchar %= qi::ascii::char_(0x21, 0x7E);
   }
 

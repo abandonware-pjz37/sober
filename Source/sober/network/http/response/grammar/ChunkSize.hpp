@@ -18,6 +18,8 @@ namespace http {
 namespace response {
 namespace grammar {
 
+// rfc7230, 4.1. Chunked Transfer Coding
+// Note: originally chunk-size do not include CRLF
 template <class Iterator>
 struct ChunkSize: qi::grammar<Iterator, attribute::ChunkSize()> {
   using Base = qi::grammar<Iterator, attribute::ChunkSize()>;

@@ -9,7 +9,7 @@ namespace network {
 namespace http {
 namespace request {
 
-// 5.1.1 Method
+// http://tools.ietf.org/html/rfc7231#section-4.3
 enum class Method {
   OPTIONS,
   GET,

@@ -14,7 +14,7 @@ namespace http {
 namespace response {
 namespace grammar {
 
-// 14.41 Transfer-Encoding
+// rfc7230, 3.3.1. Transfer-Encoding
 template <class Iterator>
 struct TransferEncoding: qi::grammar<Iterator, attribute::TransferEncoding()> {
   using Base = qi::grammar<Iterator, attribute::TransferEncoding()>;
@@ -22,7 +22,7 @@ struct TransferEncoding: qi::grammar<Iterator, attribute::TransferEncoding()> {
   TransferEncoding(): Base(transfer_encoding) {
     using TE = attribute::TransferEncoding;
 
-    // 3.6 Transfer Coding
+    // rfc7230, 4. Transfer Coding
     transfer_extension = *(qi::char_ - cr); // partial parse here, accept any
     transfer_coding %=
         qi::lit("chunked")[qi::_val = TE::CHUNKED] |

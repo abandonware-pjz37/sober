@@ -18,7 +18,7 @@ template <class Iterator>
 struct HTAB: qi::grammar<Iterator, attribute::HTAB()> {
   using Base = qi::grammar<Iterator, attribute::HTAB()>;
 
-  Header(): Base(header) {
+  HTAB(): Base(htab) {
     htab %= qi::ascii::char_(0x09);
   }
 

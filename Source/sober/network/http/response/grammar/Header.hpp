@@ -24,8 +24,8 @@ namespace http {
 namespace response {
 namespace grammar {
 
-// 6 Response
-// Header = Response without message-body
+// rfc7230, 3. Message Format
+// Header = HTTP-message without message-body
 template <class Iterator>
 struct Header: qi::grammar<Iterator, attribute::Header()> {
   using Base = qi::grammar<Iterator, attribute::Header()>;
@@ -43,10 +43,12 @@ struct Header: qi::grammar<Iterator, attribute::Header()> {
 
     any_header = +(qi::char_ - cr);
 
+    // rfc7230, 3.1. Start Line
+    // start-line = status-line (for response)
     header = qi::eps[at_c<1>(_val) = 0] >>
         qi::eps[at_c<2>(_val) = attribute::TransferEncoding::OTHER] >>
         status_line[at_c<0>(_val) = _1] >>
-        // 7.1 Entity Header Fields (simplified version) --
+        // Headers (simplified version) --
         +(
             (
                 content_length[at_c<1>(_val) = _1] |

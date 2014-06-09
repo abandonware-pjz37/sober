@@ -76,7 +76,7 @@ class Response {
   response::attribute::Header header_;
 
   /**
-    * @detail rfc2616, 3.6.1 Chunked Transfer Coding:
+    * @detail rfc7230, 4.1 Chunked Transfer Coding:
     * chunk-size << crlf << chunk-data << crlf
     * where the last chunk has chunk-size = 0 and no chunk-data, i.e.:
     * "0" << crlf << crlf

@@ -13,7 +13,7 @@ namespace http {
 namespace response {
 namespace grammar {
 
-// 6.1.1 Status Code and Reason Phrase
+// rfc7230, 3.1.2. Status Line
 template <class Iterator>
 struct StatusCode: qi::grammar<Iterator, attribute::StatusCode()> {
   using Base = qi::grammar<Iterator, attribute::StatusCode()>;

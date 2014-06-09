@@ -12,7 +12,7 @@ namespace http {
 namespace response {
 namespace grammar {
 
-// 3.1 HTTP Version (expected 1.1 version)
+// rfc7230, 2.6. Protocol Versioning
 template <class Iterator>
 struct HTTPVersion: qi::grammar<Iterator, void()> {
   using Base = qi::grammar<Iterator, void()>;
