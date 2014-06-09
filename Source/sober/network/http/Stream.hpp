@@ -29,7 +29,7 @@ namespace http {
   * @code
   * // 1. Init
   * Engine engine;
-  * sink::String sink = ...; // any class with delegate::Interface interface
+  * delegate::String sink = ...; // any class with delegate::Interface interface
   * Stream stream(engine);
   * stream.set_delegate(sink);
   * // 2. Configure request and response
