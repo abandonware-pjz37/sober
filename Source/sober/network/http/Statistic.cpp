@@ -7,28 +7,28 @@ namespace sober {
 namespace network {
 namespace http {
 
-Statistic::Statistic() noexcept {
+Statistic::Statistic() BOOST_NOEXCEPT {
   clear();
 }
 
-void Statistic::clear() noexcept {
+void Statistic::clear() BOOST_NOEXCEPT {
   reconnect_ = 0;
   restarted_ = 0;
 }
 
-void Statistic::on_reconnect() noexcept {
+void Statistic::on_reconnect() BOOST_NOEXCEPT {
   ++reconnect_;
 }
 
-void Statistic::on_restart() noexcept {
+void Statistic::on_restart() BOOST_NOEXCEPT {
   ++restarted_;
 }
 
-Statistic::Counter Statistic::get_reconnect() const noexcept {
+Statistic::Counter Statistic::get_reconnect() const BOOST_NOEXCEPT {
   return reconnect_;
 }
 
-Statistic::Counter Statistic::get_restarted() const noexcept {
+Statistic::Counter Statistic::get_restarted() const BOOST_NOEXCEPT {
   return restarted_;
 }
 

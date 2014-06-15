@@ -57,7 +57,7 @@ void OpenWeatherMap::Attribute::fill(const ciere::json::value& value) {
   temperature_human = str_.str();
 }
 
-void OpenWeatherMap::body_start() noexcept {
+void OpenWeatherMap::body_start() BOOST_NOEXCEPT {
   Base::body_start();
   valid_ = false;
 }

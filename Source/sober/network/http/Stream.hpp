@@ -90,8 +90,8 @@ class Stream {
   /**
     * @brief HTTP-stream statistic
     */
-  const Statistic& statistic() const noexcept;
-  void clear_statistic() noexcept;
+  const Statistic& statistic() const BOOST_NOEXCEPT;
+  void clear_statistic() BOOST_NOEXCEPT;
   //@}
 
   Request request;

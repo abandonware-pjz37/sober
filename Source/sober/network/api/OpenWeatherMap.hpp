@@ -35,7 +35,7 @@ class OpenWeatherMap : public http::delegate::Json {
   void async_get_city(const char* city);
   void async_get_city(const std::string& city);
 
-  virtual void body_start() noexcept override;
+  virtual void body_start() BOOST_NOEXCEPT override;
   virtual void on_success() override;
 
   /**

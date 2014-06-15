@@ -215,15 +215,15 @@ TEST_F(Engine, reconnect_delegate) {
 TEST_F(Engine, success_handler) {
   class Delegate : public http::delegate::String {
    public:
-    Delegate() noexcept: done_(false) {
+    Delegate() BOOST_NOEXCEPT: done_(false) {
     }
 
-    void on_success() noexcept override {
+    void on_success() BOOST_NOEXCEPT override {
       done_ = true;
       ASSERT_STREQ(body().c_str(), "Hello, request!");
     }
 
-    bool done() const noexcept {
+    bool done() const BOOST_NOEXCEPT {
       return done_;
     }
 
@@ -251,13 +251,13 @@ TEST_F(Engine, chain_request) {
 
   class Delegate : public http::delegate::String {
    public:
-    Delegate(http::Stream& stream, std::string& result) noexcept:
+    Delegate(http::Stream& stream, std::string& result) BOOST_NOEXCEPT:
         stream_(stream),
         first_done_(false),
         result_(result) {
     }
 
-    void on_success() noexcept override {
+    void on_success() BOOST_NOEXCEPT override {
       if (first_done_) {
         result_ = body();
         return;

@@ -99,11 +99,11 @@ void Stream::cancel() {
   restart_timer_.cancel();
 }
 
-const Statistic& Stream::statistic() const noexcept {
+const Statistic& Stream::statistic() const BOOST_NOEXCEPT {
   return statistic_;
 }
 
-void Stream::clear_statistic() noexcept {
+void Stream::clear_statistic() BOOST_NOEXCEPT {
   statistic_.clear();
 }
 
