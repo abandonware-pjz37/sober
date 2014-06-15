@@ -34,6 +34,11 @@ class Interface {
   virtual Iterator pick_connect_endpoint(Iterator iterator);
 
   /**
+    * @details Allow URL redirection
+    */
+  virtual bool allow_redirection();
+
+  /**
     * @details Successfull HTTP-response event:
     * 1. body is ready
     * 2. status code is OK

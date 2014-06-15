@@ -205,6 +205,43 @@ TEST_F(Response, chunked_fail) {
   ASSERT_FALSE(delegate.ready());
 }
 
+TEST_F(Response, location) {
+  std::string message(
+      "HTTP/1.1 200 OK\r\n"
+      "Location: http://some.location.com\r\n"
+      "Content-Length: 12\r\n"
+      "\r\n"
+      "Hello, body!"
+  );
+
+  delegate::String delegate;
+
+  ASSERT_FALSE(delegate.ready());
+  const auto response = make_response(message, delegate);
+  ASSERT_TRUE(delegate.ready());
+  ASSERT_TRUE(response->header().location.is_initialized());
+  ASSERT_STREQ(
+      response->header().location.get().string().c_str(),
+      "http://some.location.com"
+  );
+}
+
+TEST_F(Response, no_location) {
+  std::string message(
+      "HTTP/1.1 200 OK\r\n"
+      "Content-Length: 12\r\n"
+      "\r\n"
+      "Hello, body!"
+  );
+
+  delegate::String delegate;
+
+  ASSERT_FALSE(delegate.ready());
+  const auto response = make_response(message, delegate);
+  ASSERT_TRUE(delegate.ready());
+  ASSERT_FALSE(response->header().location.is_initialized());
+}
+
 } // namespace unittest
 } // namespace http
 } // namespace network

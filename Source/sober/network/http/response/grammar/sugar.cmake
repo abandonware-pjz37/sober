@@ -17,7 +17,9 @@ sugar_files(
     ContentLength.hpp
     HTAB.hpp
     HTTPVersion.hpp
+    Header.hpp
     LF.hpp
+    Location.hpp
     ObsText.hpp
     ReasonPhrase.hpp
     SP.hpp

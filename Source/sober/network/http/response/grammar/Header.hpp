@@ -17,6 +17,7 @@
 #include <sober/network/http/response/grammar/CR.hpp>
 #include <sober/network/http/response/grammar/CRLF.hpp>
 #include <sober/network/http/response/grammar/ContentLength.hpp>
+#include <sober/network/http/response/grammar/Location.hpp>
 #include <sober/network/http/response/grammar/StatusLine.hpp>
 #include <sober/network/http/response/grammar/TransferEncoding.hpp>
 
@@ -42,6 +43,7 @@ struct Header: qi::grammar<Iterator, attribute::Header()> {
     // at_c<0> StatusLine status_line;
     // at_c<1> ContentLength content_length;
     // at_c<2> TransferEncoding transfer_encoding;
+    // at_c<3> Location location;
 
     any_header = +(qi::char_ - cr);
 
@@ -55,6 +57,7 @@ struct Header: qi::grammar<Iterator, attribute::Header()> {
             (
                 content_length[at_c<1>(_val) = _1] |
                 transfer_encoding[at_c<2>(_val) = _1] |
+                location[at_c<3>(_val) = _1] |
                 any_header
             ) >> crlf
         ) >>
@@ -66,6 +69,7 @@ struct Header: qi::grammar<Iterator, attribute::Header()> {
   StatusLine<Iterator> status_line;
   ContentLength<Iterator> content_length;
   TransferEncoding<Iterator> transfer_encoding;
+  Location<Iterator> location;
   CR<Iterator> cr;
   CRLF<Iterator> crlf;
 

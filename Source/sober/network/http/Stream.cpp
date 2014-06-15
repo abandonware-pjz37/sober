@@ -268,6 +268,25 @@ void Stream::read_some_handler(
   using StatusCode = response::attribute::StatusCode;
   const StatusCode status_code = response.header().status_line.status_code;
 
+  // Redirection
+  if (status_code == StatusCode::FOUND) {
+    if (delegate_ == nullptr) {
+      BOOST_LOG(log_.info) << "Redirection not allowed (no delegate)";
+    }
+    else if(!delegate_->allow_redirection()) {
+      BOOST_LOG(log_.info) << "Redirection not allowed by delegate";
+    }
+    else if (!response.header().location.is_initialized()) {
+      BOOST_LOG(log_.info) << "Redirect response without Location header";
+    }
+    else {
+      const ::network::uri& location = response.header().location.get();
+      BOOST_LOG(log_.info) << "Redirect to " << location;
+      set_endpoint(location);
+      return start();
+    }
+  }
+
   const bool success = (status_code == StatusCode::OK);
   if (!success) {
     BOOST_LOG(log_.info) << "Status code is not OK: " << status_code;

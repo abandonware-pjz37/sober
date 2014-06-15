@@ -401,6 +401,30 @@ TEST_F(Engine, race_with_cancel) {
   );
 }
 
+TEST_F(Engine, redirect) {
+  class Delegate: public http::delegate::String {
+   public:
+    virtual bool allow_redirection() override {
+      return true;
+    }
+  };
+
+  Delegate delegate;
+
+  stream_.set_delegate(delegate);
+
+  stream_.set_endpoint("http://www.rzd.ru");
+  stream_.async_start();
+
+  engine_.run();
+
+  ASSERT_TRUE(delegate.ready());
+  ASSERT_EQ(
+      stream_.response.header().status_line.status_code,
+      http::response::attribute::StatusCode::OK
+  );
+}
+
 } // namespace unittest
 } // namespace network
 } // namespace sober

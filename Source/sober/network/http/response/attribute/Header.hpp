@@ -5,6 +5,7 @@
 // All rights reserved.
 
 #include <sober/network/http/response/attribute/ContentLength.hpp>
+#include <sober/network/http/response/attribute/Location.hpp>
 #include <sober/network/http/response/attribute/StatusLine.hpp>
 #include <sober/network/http/response/attribute/TransferEncoding.hpp>
 
@@ -18,6 +19,7 @@ struct Header {
   StatusLine status_line;
   ContentLength content_length;
   TransferEncoding transfer_encoding;
+  boost::optional<Location> location;
 };
 
 } // namespace attribute
@@ -34,6 +36,9 @@ BOOST_FUSION_ADAPT_STRUCT(
     )
     (sober::network::http::response::attribute::TransferEncoding,
         transfer_encoding
+    )
+    (boost::optional<sober::network::http::response::attribute::Location>,
+        location
     )
 )
 

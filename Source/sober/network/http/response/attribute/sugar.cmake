@@ -14,6 +14,7 @@ sugar_files(
     ChunkSize.hpp
     ContentLength.hpp
     HTAB.hpp
+    Location.hpp
     ObsText.hpp
     ReasonPhrase.hpp
     SP.hpp
