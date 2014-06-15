@@ -1,10 +1,17 @@
-#include <gtest/gtest.h> // TEST_F
+#include <leathers/push>
+#include <leathers/all>
+# include <gtest/gtest.h> // TEST_F
+# include <thread> // std::this_thread
+#include <leathers/pop>
+
 #include <sober/network/Engine.hpp>
 #include <sober/network/http/Stream.hpp>
 #include <sober/network/http/delegate/Retry.hpp>
 #include <sober/network/http/delegate/String.hpp>
 #include <sober/utils/Test.hpp>
-#include <thread> // std::this_thread
+
+#include <leathers/push>
+#include <leathers/global-constructors>
 
 namespace sober {
 namespace network {
@@ -12,13 +19,20 @@ namespace unittest {
 
 class Long: public utils::Test {
  public:
-  Long(): stream_(engine_) {
-  }
+  Long();
+
+  virtual ~Long();
 
  protected:
   network::Engine engine_;
   network::http::Stream stream_;
 };
+
+Long::Long(): stream_(engine_) {
+}
+
+Long::~Long() {
+}
 
 TEST_F(Long, queries_with_timeout) {
   class Delegate: public http::delegate::Retry, public http::delegate::String {
@@ -74,3 +88,5 @@ TEST_F(Long, operation_timeout) {
 } // namespace unittest
 } // namespace network
 } // namespace sober
+
+#include <leathers/pop>

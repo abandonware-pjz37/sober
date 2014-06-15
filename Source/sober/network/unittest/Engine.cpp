@@ -1,9 +1,13 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
-#include <chrono>
-#include <gtest/gtest.h> // TEST_F
+#include <leathers/push>
+#include <leathers/all>
+# include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
+# include <chrono>
+# include <gtest/gtest.h> // TEST_F
+#include <leathers/pop>
+
 #include <sober/network/Engine.hpp>
 #include <sober/network/http/Stream.hpp>
 #include <sober/network/http/delegate/Reconnect.hpp>
@@ -12,6 +16,9 @@
 #include <sober/network/http/delegate/String.hpp>
 #include <sober/utils/Test.hpp>
 #include <sober/utils/run_duration.hpp>
+
+#include <leathers/push>
+#include <leathers/global-constructors>
 
 namespace sober {
 namespace network {
@@ -23,10 +30,15 @@ class Engine: public utils::Test {
       stream_(engine_) {
   }
 
+  virtual ~Engine() override;
+
  protected:
   network::Engine engine_;
   network::http::Stream stream_;
 };
+
+Engine::~Engine() {
+}
 
 TEST_F(Engine, simple) {
   http::delegate::String delegate;
@@ -247,7 +259,7 @@ TEST_F(Engine, chain_request) {
   // 1: http://pastebin.com/raw.php?i=Peb93awR -> "A8wzq8s3"
   // 2: http://pastebin.com/raw.php?i=A8wzq8s3 -> "Hello, request!"
 
-  std::string result;
+  std::string req_result;
 
   class Delegate : public http::delegate::String {
    public:
@@ -275,14 +287,14 @@ TEST_F(Engine, chain_request) {
     std::string& result_;
   };
 
-  Delegate delegate(stream_, result);
+  Delegate delegate(stream_, req_result);
   stream_.set_delegate(delegate);
   stream_.set_endpoint("http://pastebin.com/raw.php?i=Peb93awR");
   stream_.async_start();
 
   engine_.run();
 
-  ASSERT_STREQ(result.c_str(), "Hello, request!");
+  ASSERT_STREQ(req_result.c_str(), "Hello, request!");
 }
 
 TEST_F(Engine, race) {
@@ -388,6 +400,9 @@ TEST_F(Engine, race_with_cancel) {
       http::response::attribute::StatusCode::OK
   );
 }
+
 } // namespace unittest
 } // namespace network
 } // namespace sober
+
+#include <leathers/pop>

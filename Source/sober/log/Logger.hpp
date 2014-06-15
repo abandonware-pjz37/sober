@@ -4,8 +4,11 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <boost/log/sources/logger.hpp>
-#include <sober/log/Severity.fpp>
+#include <leathers/push>
+#include <leathers/all>
+# include <boost/log/sources/logger.hpp>
+# include <sober/log/Severity.fpp>
+#include <leathers/pop>
 
 namespace sober {
 namespace log {
@@ -15,6 +18,8 @@ class Logger {
   using Instance = boost::log::sources::logger;
 
   Logger(const char* name, const void* parent);
+
+  static void init_logs_for_testing(bool log_to_cout, bool log_cout_verbose);
 
   Instance debug;
   Instance info;

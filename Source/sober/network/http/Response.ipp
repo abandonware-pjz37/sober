@@ -31,7 +31,9 @@ std::size_t Response::parse(const Grammar& grammar, Attribute& attribute) {
     return 0;
   }
 
-  const std::size_t length = begin - data_ptr();
+  // TODO (check conversion)
+  const std::size_t length = static_cast<std::size_t>(begin - data_ptr());
+
   assert(length != 0);
   buffer_.consume(length);
   return length;

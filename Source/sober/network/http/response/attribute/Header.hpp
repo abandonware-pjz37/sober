@@ -4,8 +4,8 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <sober/network/http/response/attribute/StatusLine.hpp>
 #include <sober/network/http/response/attribute/ContentLength.hpp>
+#include <sober/network/http/response/attribute/StatusLine.hpp>
 #include <sober/network/http/response/attribute/TransferEncoding.hpp>
 
 namespace sober {

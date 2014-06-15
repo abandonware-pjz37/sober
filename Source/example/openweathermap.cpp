@@ -14,9 +14,7 @@ class Delegate : public sober::network::api::OpenWeatherMap {
       max_count_(10) {
   }
 
-  virtual void on_start() override {
-    counter_ = 0;
-  }
+  virtual void on_start() override;
 
   virtual boost::posix_time::time_duration watchdog_period() override {
     return boost::posix_time::milliseconds(1000);
@@ -66,16 +64,23 @@ class Delegate : public sober::network::api::OpenWeatherMap {
   int counter_;
 };
 
+void Delegate::on_start() {
+  counter_ = 0;
+}
+
 int main() {
   try {
     const bool debug = false;
 
+#include <leathers/push>
+#include <leathers/unreachable-code>
     if (debug) {
-      sober::utils::Test::init_logs(true, true);
+      sober::log::Logger::init_logs_for_testing(true, true);
     }
     else {
-      sober::utils::Test::init_logs(false, false);
+      sober::log::Logger::init_logs_for_testing(false, false);
     }
+#include <leathers/pop>
 
     namespace net = sober::network;
 

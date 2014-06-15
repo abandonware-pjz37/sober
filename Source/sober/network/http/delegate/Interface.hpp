@@ -6,7 +6,11 @@
 
 #include <sober/network/http/delegate/Interface.fpp>
 
-#include <boost/asio/ip/tcp.hpp>
+#include <leathers/push>
+#include <leathers/all>
+# include <boost/asio/ip/tcp.hpp>
+#include <leathers/pop>
+
 #include <sober/network/http/response/attribute/StatusCode.fpp>
 
 namespace sober {
@@ -21,24 +25,20 @@ class Interface {
   /**
     * @note On operation start. Init internal state (Stream::async_start)
     */
-  virtual void on_start() {
-  }
+  virtual void on_start();
 
   /**
     * @details User can specify to which endpoint connect first
     * @note Called on initialization of asynchronous connect operation
     */
-  virtual Iterator pick_connect_endpoint(Iterator iterator) {
-    return iterator;
-  }
+  virtual Iterator pick_connect_endpoint(Iterator iterator);
 
   /**
     * @details Successfull HTTP-response event:
     * 1. body is ready
     * 2. status code is OK
     */
-  virtual void on_success() {
-  }
+  virtual void on_success();
 
   /**
     * @defgroup HTTP-response body
@@ -47,21 +47,18 @@ class Interface {
   /**
     * @details Start writing body
     */
-  virtual void body_start() {
-  }
+  virtual void body_start();
 
   /**
     * @details Body data chunk
     */
-  virtual void body_write(const char* buffer, std::size_t size) {
-  }
+  virtual void body_write(const char* buffer, std::size_t size);
 
   /**
     * @details Finish writing body
     * @note don't mean response is successful (check status code)
     */
-  virtual void body_finish() {
-  }
+  virtual void body_finish();
   /** @} */
 
   /**
@@ -72,23 +69,17 @@ class Interface {
   /**
     * @details Watchdog callback period
     */
-  virtual boost::posix_time::time_duration watchdog_period() {
-    return boost::posix_time::pos_infin;
-  }
+  virtual boost::posix_time::time_duration watchdog_period();
 
   /**
     * @details Do stop on watchdog callback
     */
-  virtual bool force_stop() {
-    return false;
-  }
+  virtual bool force_stop();
 
   /**
     * @details Try other connection if not already connected
     */
-  virtual bool force_reconnect() {
-    return false;
-  }
+  virtual bool force_reconnect();
 
   /** @} */
 
@@ -100,24 +91,20 @@ class Interface {
   /**
     * @details Duration of pause to restart operation
     */
-  virtual boost::posix_time::time_duration restart_pause() {
-    return boost::posix_time::milliseconds(0);
-  }
+  virtual boost::posix_time::time_duration restart_pause();
 
   /**
     * @details Do restart if error occurs
     */
-  virtual bool restart_on_error(const boost::system::error_code&) {
-    return false;
-  }
+  virtual bool restart_on_error(const boost::system::error_code&);
 
   /**
     * @details Do restart if error occurs (status code is not OK)
     */
-  virtual bool restart_on_error(const response::attribute::StatusCode&) {
-    return false;
-  }
+  virtual bool restart_on_error(const response::attribute::StatusCode&);
   /** @} */
+
+  virtual ~Interface();
 };
 
 } // namespace delegate

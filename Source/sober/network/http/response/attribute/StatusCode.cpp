@@ -261,9 +261,12 @@ std::ostream& operator<< (std::ostream& stream, StatusCode status_code) {
     case StatusCode::NETWORK_CONNECT_TIMEOUT_ERROR:
       stream << "Network connect timeout error";
       break;
+#include <leathers/push>
+#include <leathers/unreachable-code>
     default:
       stream << "!UNKNOWN!";
       break;
+#include <leathers/pop>
   }
   stream << "(" << static_cast<int>(status_code) << ")";
   return stream;

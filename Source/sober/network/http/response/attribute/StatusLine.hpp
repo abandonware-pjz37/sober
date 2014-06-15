@@ -4,10 +4,13 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
+#include <leathers/push>
+#include <leathers/all>
+# include <boost/fusion/adapted.hpp> // BOOST_FUSION_ADAPT_STRUCT
+#include <leathers/pop>
+
 #include <sober/network/http/response/attribute/StatusCode.hpp>
 #include <sober/network/http/response/attribute/ReasonPhrase.hpp>
-
-#include <boost/fusion/adapted.hpp> // BOOST_FUSION_ADAPT_STRUCT
 
 namespace sober {
 namespace network {

@@ -4,8 +4,12 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/streambuf.hpp>
+#include <leathers/push>
+#include <leathers/all>
+# include <boost/asio/ip/tcp.hpp>
+# include <boost/asio/streambuf.hpp>
+#include <leathers/pop>
+
 #include <sober/log/Logger.hpp>
 #include <sober/network/http/Stream.fpp>
 #include <sober/network/http/delegate/Interface.fpp>
@@ -76,7 +80,7 @@ class Response {
   response::attribute::Header header_;
 
   /**
-    * @detail rfc7230, 4.1 Chunked Transfer Coding:
+    * @details rfc7230, 4.1 Chunked Transfer Coding:
     * chunk-size << crlf << chunk-data << crlf
     * where the last chunk has chunk-size = 0 and no chunk-data, i.e.:
     * "0" << crlf << crlf

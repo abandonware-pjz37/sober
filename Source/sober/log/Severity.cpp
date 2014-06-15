@@ -19,8 +19,11 @@ std::ostream& operator<<(std::ostream& stream, Severity severity) {
     case Severity::ERROR:
       stream << "ERROR";
       break;
+#include <leathers/push>
+#include <leathers/unreachable-code>
     default:
       throw std::runtime_error("sober::log::Severity switch");
+#include <leathers/pop>
   }
   return stream;
 }

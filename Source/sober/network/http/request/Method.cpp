@@ -20,8 +20,11 @@ const char* to_const_char(const Method& method) {
     case Method::DELETE: return "DELETE";
     case Method::TRACE: return "TRACE";
     case Method::CONNECT: return "CONNECT";
+#include <leathers/push>
+#include <leathers/unreachable-code>
     default:
       throw std::runtime_error("Can't print Method");
+#include <leathers/pop>
   }
 }
 

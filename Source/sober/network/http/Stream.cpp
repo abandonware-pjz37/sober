@@ -3,14 +3,19 @@
 
 #include <sober/network/http/Stream.hpp>
 
-#include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
-#include <network/uri.hpp>
+#include <leathers/push>
+#include <leathers/all>
+# include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
+# include <network/uri.hpp>
+#include <leathers/pop>
+
 #include <sober/log/Severity.hpp>
 #include <sober/network/Engine.ipp>
 #include <sober/network/http/ConnectManager.ipp> // connect_manager_
 #include <sober/network/http/Request.ipp> // request_
 #include <sober/network/http/Response.ipp> // response_
 #include <sober/network/http/delegate/Interface.hpp>
+#include <sober/asserts/sober_assert.hpp> // SOBER_ASSERT_TRUE
 
 namespace sober {
 namespace network {
@@ -262,6 +267,7 @@ void Stream::read_some_handler(
 
   using StatusCode = response::attribute::StatusCode;
   const StatusCode status_code = response.header().status_line.status_code;
+
   const bool success = (status_code == StatusCode::OK);
   if (!success) {
     BOOST_LOG(log_.info) << "Status code is not OK: " << status_code;
@@ -311,7 +317,7 @@ void Stream::watchdog_handler() {
   const Error error;
   const bool verify_true = stop_condition(error, "watchdog handler");
 
-  assert(verify_true);
+  SOBER_ASSERT_TRUE_VAR(verify_true);
 }
 
 } // namespace http

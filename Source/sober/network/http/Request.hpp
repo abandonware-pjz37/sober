@@ -6,8 +6,12 @@
 
 #include <sober/network/http/Request.fpp>
 
-#include <boost/asio/ip/tcp.hpp> // socket
-#include <boost/asio/streambuf.hpp>
+#include <leathers/push>
+#include <leathers/all>
+# include <boost/asio/ip/tcp.hpp> // socket
+# include <boost/asio/streambuf.hpp>
+#include <leathers/pop>
+
 #include <sober/log/Logger.hpp>
 #include <sober/network/http/request/Method.fpp>
 #include <string>

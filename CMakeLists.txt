@@ -15,6 +15,7 @@ hunter_add_package(Boost COMPONENTS thread system log)
 hunter_add_package(CppNetlibUri)
 hunter_add_package(GTest)
 hunter_add_package(JsonSpirit)
+hunter_add_package(Leathers)
 hunter_add_package(Sugar)
 
 ### Find dependencies ###
@@ -23,10 +24,12 @@ find_package(Boost REQUIRED thread system log log_setup)
 find_package(CppNetlibUri CONFIG REQUIRED)
 find_package(GTest CONFIG REQUIRED)
 find_package(JsonSpirit CONFIG REQUIRED)
+find_package(Leathers CONFIG REQUIRED)
 
 ### - ###
 include("${SUGAR_ROOT}/cmake/Sugar")
 include(sugar_add_gtest)
+include(sugar_generate_warning_flags)
 include(sugar_groups_generate)
 include(sugar_include)
 
@@ -46,21 +49,34 @@ sugar_groups_generate(${SOBER_UT_SOURCES})
 sugar_groups_generate(${SOBER_LONG_UT_SOURCES})
 
 ### Targets ###
-string(COMPARE EQUAL "${CMAKE_CXX_COMPILER_ID}" "Clang" is_clang)
-string(COMPARE EQUAL "${CMAKE_CXX_COMPILER_ID}" "AppleClang" is_apple_clang)
-if(is_clang OR is_apple_clang)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-register")
-endif()
+
+sugar_generate_warning_flags(
+    flags
+    properties
+    DISABLE c++98-compat c++98-compat-pedantic covered-switch-default padded
+    ENABLE ALL
+    TREAT_AS_ERROR ALL
+    CLEAR_GLOBAL
+)
 
 add_library(sober ${SOBER_SOURCES})
+set_target_properties(
+    sober PROPERTIES ${properties} COMPILE_OPTIONS "${flags}"
+)
 
 if(SOBER_BUILD_TESTS)
   add_executable(sober_ut ${SOBER_UT_SOURCES})
+  set_target_properties(
+      sober_ut PROPERTIES ${properties} COMPILE_OPTIONS "${flags}"
+  )
   target_link_libraries(sober_ut sober GTest::main)
 endif()
 
 if(SOBER_BUILD_LONG_TESTS)
   add_executable(sober_long_ut ${SOBER_LONG_UT_SOURCES})
+  set_target_properties(
+      sober_long_ut PROPERTIES ${properties} COMPILE_OPTIONS "${flags}"
+  )
   target_link_libraries(sober_long_ut sober GTest::main)
 endif()
 
@@ -68,6 +84,9 @@ if(SOBER_BUILD_EXAMPLES)
   foreach(src ${SOBER_EXAMPLE_SOURCES})
     get_filename_component(test_name "${src}" NAME_WE)
     add_executable(example_${test_name} "${src}")
+    set_target_properties(
+        example_${test_name} PROPERTIES ${properties} COMPILE_OPTIONS "${flags}"
+    )
     target_link_libraries(example_${test_name} sober)
   endforeach()
 endif()
@@ -95,7 +114,7 @@ if(is_ios)
 endif()
 
 target_include_directories(sober SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
-target_link_libraries(sober PUBLIC ${Boost_LIBRARIES} network-uri json)
+target_link_libraries(sober PUBLIC ${Boost_LIBRARIES} network-uri json leathers)
 
 ### Testing ###
 enable_testing()

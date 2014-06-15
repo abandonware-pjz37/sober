@@ -4,7 +4,10 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <gtest/gtest.h> // ::testing::Test
+#include <leathers/push>
+#include <leathers/all>
+# include <gtest/gtest.h> // ::testing::Test
+#include <leathers/pop>
 
 namespace sober {
 namespace utils {
@@ -13,9 +16,9 @@ class Test: public ::testing::Test {
  public:
   using Base = ::testing::Test;
 
-  static void init_logs(bool log_to_cout, bool log_cout_verbose);
-
   static void SetUpTestCase();
+
+  virtual ~Test();
 };
 
 } // namespace utils

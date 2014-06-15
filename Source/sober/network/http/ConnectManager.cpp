@@ -3,9 +3,13 @@
 
 #include <sober/network/http/ConnectManager.hpp>
 
-#include <boost/log/attributes/constant.hpp>
-#include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
-#include <network/uri/uri.hpp>
+#include <leathers/push>
+#include <leathers/all>
+# include <boost/log/attributes/constant.hpp>
+# include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
+# include <network/uri/uri.hpp>
+#include <leathers/pop>
+
 #include <sober/log/Severity.hpp>
 #include <sober/network/http/Request.hpp>
 

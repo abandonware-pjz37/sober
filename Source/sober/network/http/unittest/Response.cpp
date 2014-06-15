@@ -3,10 +3,17 @@
 
 #include <sober/network/http/unittest/Response.fpp>
 
-#include <gtest/gtest.h> // TEST_F
+#include <leathers/push>
+#include <leathers/all>
+# include <gtest/gtest.h> // TEST_F
+#include <leathers/pop>
+
 #include <sober/network/http/Response.hpp>
 #include <sober/network/http/delegate/String.hpp>
 #include <sober/utils/Test.hpp>
+
+#include <leathers/push>
+#include <leathers/global-constructors>
 
 namespace sober {
 namespace network {
@@ -21,7 +28,12 @@ class Response : public utils::Test {
   Pointer make_response(const std::string& message, delegate::Interface& d) {
     return Pointer(new http::Response(message, d));
   }
+
+  virtual ~Response() override;
 };
+
+Response::~Response() {
+}
 
 TEST_F(Response, content_length_good) {
   std::string message(
@@ -197,3 +209,5 @@ TEST_F(Response, chunked_fail) {
 } // namespace http
 } // namespace network
 } // namespace sober
+
+#include <leathers/pop>

@@ -6,7 +6,11 @@
 
 #include <sober/network/http/Stream.fpp>
 
-#include <boost/asio.hpp>
+#include <leathers/push>
+#include <leathers/all>
+# include <boost/asio.hpp>
+#include <leathers/pop>
+
 #include <sober/log/Logger.hpp>
 #include <sober/network/Engine.fpp>
 #include <sober/network/http/ConnectManager.hpp>
@@ -64,8 +68,9 @@ class Stream {
   //@{
   /**
     * @note Set both @c ConnectManager and @c Request
-    * @brief Set host and port to @c ConnectManager
-    * @brief Set host and query to @c Request
+    * @brief
+    * 1. Set host and port to @c ConnectManager
+    * 2. Set host and query to @c Request
     */
   void set_endpoint(const std::string& uri);
   void set_endpoint(const ::network::uri& uri);
