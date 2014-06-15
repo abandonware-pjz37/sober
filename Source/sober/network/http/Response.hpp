@@ -33,19 +33,19 @@ class Response {
   void set_delegate(delegate::Interface&);
 
   template <class Handler>
-  void async_read_some(Socket& socket, Handler&& handler) noexcept;
+  void async_read_some(Socket& socket, Handler&& handler) BOOST_NOEXCEPT;
 
   /**
     * @return true - Stop async reading (read successful)
     * @return false - Need more data, continue async reading
     * @todo Optimization: check parse error (for now try parse until EOF)
     */
-  bool on_read(std::size_t bytes_transferred) noexcept;
+  bool on_read(std::size_t bytes_transferred) BOOST_NOEXCEPT;
 
   /**
     * @brief Clear sink and buffer
     */
-  void clear() noexcept;
+  void clear() BOOST_NOEXCEPT;
 
   const response::attribute::Header& header() const;
 
@@ -62,7 +62,7 @@ class Response {
   using Buffer = boost::asio::streambuf;
   using Iterator = const char*;
 
-  Iterator data_ptr() const noexcept;
+  Iterator data_ptr() const BOOST_NOEXCEPT;
 
   template <class Grammar, class Attribute>
   std::size_t parse(const Grammar& grammar, Attribute& attribute);

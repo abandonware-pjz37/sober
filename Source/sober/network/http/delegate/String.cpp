@@ -10,10 +10,10 @@ namespace network {
 namespace http {
 namespace delegate {
 
-String::String() noexcept: ready_(false) {
+String::String() BOOST_NOEXCEPT: ready_(false) {
 }
 
-void String::body_start() noexcept {
+void String::body_start() BOOST_NOEXCEPT {
   ready_ = false;
   body_.clear();
 }
@@ -32,7 +32,7 @@ void String::body_finish() {
   ready_ = true;
 }
 
-bool String::ready() const noexcept {
+bool String::ready() const BOOST_NOEXCEPT {
   return ready_;
 }
 

@@ -15,9 +15,9 @@ namespace delegate {
 
 class String: virtual public Interface {
  public:
-  String() noexcept;
+  String() BOOST_NOEXCEPT;
 
-  virtual void body_start() noexcept override;
+  virtual void body_start() BOOST_NOEXCEPT override;
 
   /**
     * @throws @c std::runtime_error if already finished
@@ -34,7 +34,7 @@ class String: virtual public Interface {
     * @return false - body is not valid
     * @note Requests with status code != OK have valid body
     */
-  bool ready() const noexcept;
+  bool ready() const BOOST_NOEXCEPT;
 
   /**
     * @throws @c std::runtime_error if body not ready

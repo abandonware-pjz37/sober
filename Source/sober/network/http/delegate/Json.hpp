@@ -24,7 +24,7 @@ class Json: public String {
 
   Json();
 
-  virtual void body_start() noexcept override;
+  virtual void body_start() BOOST_NOEXCEPT override;
 
   /**
     * @throws @c cierre::json::exception if JSON parse failed

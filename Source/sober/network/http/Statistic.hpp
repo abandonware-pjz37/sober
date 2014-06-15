@@ -14,15 +14,15 @@ class Statistic {
  public:
   using Counter = uint64_t;
 
-  Statistic() noexcept;
+  Statistic() BOOST_NOEXCEPT;
 
-  void clear() noexcept;
+  void clear() BOOST_NOEXCEPT;
 
-  void on_reconnect() noexcept;
-  void on_restart() noexcept;
+  void on_reconnect() BOOST_NOEXCEPT;
+  void on_restart() BOOST_NOEXCEPT;
 
-  Counter get_reconnect() const noexcept;
-  Counter get_restarted() const noexcept;
+  Counter get_reconnect() const BOOST_NOEXCEPT;
+  Counter get_restarted() const BOOST_NOEXCEPT;
 
  private:
   Counter reconnect_;

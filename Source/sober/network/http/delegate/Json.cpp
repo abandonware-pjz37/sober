@@ -17,7 +17,7 @@ namespace delegate {
 Json::Json(): log_("sober.network.http.delegate.Json", this) {
 }
 
-void Json::body_start() noexcept {
+void Json::body_start() BOOST_NOEXCEPT {
   Base::body_start();
   valid_ = false;
 }

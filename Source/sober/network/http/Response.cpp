@@ -31,7 +31,7 @@ void Response::set_delegate(delegate::Interface& delegate) {
   delegate_ = std::addressof(delegate);
 }
 
-bool Response::on_read(std::size_t bytes_transferred) noexcept {
+bool Response::on_read(std::size_t bytes_transferred) BOOST_NOEXCEPT {
   using Encoding = response::attribute::TransferEncoding;
 
   buffer_.commit(bytes_transferred);
@@ -128,7 +128,7 @@ bool Response::on_read(std::size_t bytes_transferred) noexcept {
   }
 }
 
-void Response::clear() noexcept {
+void Response::clear() BOOST_NOEXCEPT {
   if (delegate_ != nullptr) {
     delegate_->body_start();
   }
@@ -146,7 +146,7 @@ const response::attribute::Header& Response::header() const {
   return header_;
 }
 
-Response::Iterator Response::data_ptr() const noexcept {
+Response::Iterator Response::data_ptr() const BOOST_NOEXCEPT {
   return boost::asio::buffer_cast<Response::Iterator>(buffer_.data());
 }
 
