@@ -70,17 +70,14 @@ void Delegate::on_start() {
 
 int main() {
   try {
-    const bool debug = false;
+    const bool debug = sober::utils::always();
 
-#include <leathers/push>
-#include <leathers/unreachable-code>
     if (debug) {
       sober::log::Logger::init_logs_for_testing(true, true);
     }
     else {
       sober::log::Logger::init_logs_for_testing(false, false);
     }
-#include <leathers/pop>
 
     namespace net = sober::network;
 

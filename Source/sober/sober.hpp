@@ -47,6 +47,7 @@
 #include <sober/network/http/response/grammar/TransferEncoding.hpp>
 #include <sober/network/http/response/grammar/common.hpp>
 #include <sober/utils/Test.hpp>
+#include <sober/utils/always.hpp>
 #include <sober/utils/run_duration.hpp>
 
 #endif // SOBER_SOBER_HPP_

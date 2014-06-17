@@ -10,17 +10,20 @@
 #include <leathers/pop>
 
 #include <sober/config.hpp> // SOBER_DEBUG
+#include <sober/utils/always.hpp>
 
 #if (SOBER_DEBUG)
 # define SOBER_ASSERT_TRUE(expression) \
-    do { BOOST_ASSERT(expression); } while (false)
+    do { BOOST_ASSERT(expression); } while (!sober::utils::always())
 # define SOBER_ASSERT_TRUE_VAR(variable) \
     SOBER_ASSERT_TRUE(variable)
 #else
 # define SOBER_ASSERT_TRUE(expression) \
-    do {} while (false)
+    do {} while (!sober::utils::always())
 # define SOBER_ASSERT_TRUE_VAR(variable) \
-    do { ::boost::ignore_unused_variable_warning(variable); } while (false)
+    do { \
+        ::boost::ignore_unused_variable_warning(variable); \
+    } while (!sober::utils::always())
 #endif
 
 #endif // SOBER_ASSERTS_SOBER_ASSERT_HPP_

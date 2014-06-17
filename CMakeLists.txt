@@ -21,15 +21,16 @@ hunter_add_package(Sugar)
 ### Find dependencies ###
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost REQUIRED thread system log log_setup)
-find_package(CppNetlibUri CONFIG REQUIRED)
-find_package(GTest CONFIG REQUIRED)
-find_package(JsonSpirit CONFIG REQUIRED)
-find_package(Leathers CONFIG REQUIRED)
+find_package(CppNetlibUri CONFIG REQUIRED NO_CMAKE_BUILDS_PATH)
+find_package(GTest CONFIG REQUIRED NO_CMAKE_BUILDS_PATH)
+find_package(JsonSpirit CONFIG REQUIRED NO_CMAKE_BUILDS_PATH)
+find_package(Leathers CONFIG REQUIRED NO_CMAKE_BUILDS_PATH)
 
 ### - ###
 include("${SUGAR_ROOT}/cmake/Sugar")
 include(sugar_add_gtest)
 include(sugar_generate_warning_flags)
+include(sugar_get_WIN32_WINNT)
 include(sugar_groups_generate)
 include(sugar_include)
 
@@ -53,7 +54,32 @@ sugar_groups_generate(${SOBER_LONG_UT_SOURCES})
 sugar_generate_warning_flags(
     flags
     properties
-    DISABLE c++98-compat c++98-compat-pedantic covered-switch-default padded
+    DISABLE
+    # compatibility-c++98
+    c++98-compat
+    c++98-compat-pedantic
+    # --
+
+    # special-members
+    assign-base-inaccessible
+    copy-ctor-could-not-be-generated
+    assign-could-not-be-generated
+    # --
+
+    # others
+    padded
+    covered-switch-default
+    this-used-in-init
+    name-length-exceeded
+    catch-semantic-changed
+    inherits-via-dominance
+
+    # inline
+    unreferenced-inline
+    not-inlined
+    force-not-inlined
+    automatic-inline
+
     ENABLE ALL
     TREAT_AS_ERROR ALL
     CLEAR_GLOBAL
@@ -104,6 +130,11 @@ target_compile_definitions(sober PUBLIC BOOST_SPIRIT_USE_PHOENIX_V3=1)
 
 if(MSVC)
   target_compile_definitions(sober PUBLIC BOOST_ALL_NO_LIB=1)
+endif()
+
+if(WIN32)
+  sugar_get_WIN32_WINNT(win32_winnt)
+  target_compile_definitions(sober PUBLIC _WIN32_WINNT=${win32_winnt})
 endif()
 
 # Detect iOS build
