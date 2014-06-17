@@ -13,5 +13,6 @@ sugar_files(
     SOBER_SOURCES
     Test.cpp
     Test.hpp
+    always.hpp
     run_duration.hpp
 )
