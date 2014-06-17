@@ -8,6 +8,8 @@
 
 #include <iosfwd> // std::ostream
 
+#undef ERROR // Hello, visual studio...
+
 namespace sober {
 namespace log {
 

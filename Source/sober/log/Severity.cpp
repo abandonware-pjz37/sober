@@ -3,7 +3,10 @@
 
 #include <sober/log/Severity.hpp>
 
-#include <iostream> // std::ostream
+#include <leathers/push>
+#include <leathers/all>
+# include <iostream> // std::ostream
+#include <leathers/pop>
 
 namespace sober {
 namespace log {
