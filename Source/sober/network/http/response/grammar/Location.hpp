@@ -16,7 +16,7 @@ namespace grammar {
 // http://tools.ietf.org/html/rfc7231#section-7.1.2
 template <class Iterator>
 struct Location: qi::grammar<Iterator, attribute::Location()> {
-  using Base = qi::grammar<Iterator, attribute::Location()>;
+  using Base = qi::grammar<Iterator, response::attribute::Location()>;
 
   Location(): Base(location) {
     str_location %= qi::lit("Location: ") >> *(qi::char_ - cr);
@@ -26,7 +26,7 @@ struct Location: qi::grammar<Iterator, attribute::Location()> {
   CR<Iterator> cr;
 
   qi::rule<Iterator, std::string()> str_location;
-  qi::rule<Iterator, attribute::Location()> location;
+  qi::rule<Iterator, response::attribute::Location()> location;
 };
 
 } // namespace grammar

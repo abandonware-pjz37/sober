@@ -4,6 +4,8 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
+#undef DELETE // Hello, Visual Studio...
+
 namespace sober {
 namespace network {
 namespace http {

@@ -16,13 +16,13 @@ namespace grammar {
 // rfc5234, B.1. Core Rules
 template <class Iterator>
 struct VCHAR: qi::grammar<Iterator, attribute::VCHAR()> {
-  using Base = qi::grammar<Iterator, attribute::VCHAR()>;
+  using Base = qi::grammar<Iterator, response::attribute::VCHAR()>;
 
   VCHAR(): Base(vchar) {
     vchar %= qi::ascii::char_(0x21, 0x7E);
   }
 
-  qi::rule<Iterator, attribute::VCHAR()> vchar;
+  qi::rule<Iterator, response::attribute::VCHAR()> vchar;
 };
 
 } // namespace grammar

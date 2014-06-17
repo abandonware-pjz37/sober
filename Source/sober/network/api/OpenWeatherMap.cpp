@@ -52,7 +52,7 @@ void OpenWeatherMap::Attribute::fill(const ciere::json::value& value) {
     str_ << "+";
   }
   str_ << std::setprecision(1) << std::fixed << temperature << " ";
-  str_ << "\u2103"; // Unicode: DEGREE CELSIUS
+  str_ << L"\u2103"; // Unicode: DEGREE CELSIUS
 
   temperature_human = str_.str();
 }

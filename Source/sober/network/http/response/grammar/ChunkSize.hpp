@@ -26,14 +26,14 @@ namespace grammar {
 // Note: originally chunk-size do not include CRLF
 template <class Iterator>
 struct ChunkSize: qi::grammar<Iterator, attribute::ChunkSize()> {
-  using Base = qi::grammar<Iterator, attribute::ChunkSize()>;
+  using Base = qi::grammar<Iterator, response::attribute::ChunkSize()>;
 
   ChunkSize(): Base(chunk_size) {
     chunk_size %= (qi::hex >> crlf);
   }
 
   CRLF<Iterator> crlf;
-  qi::rule<Iterator, attribute::ChunkSize()> chunk_size;
+  qi::rule<Iterator, response::attribute::ChunkSize()> chunk_size;
 };
 
 } // namespace grammar

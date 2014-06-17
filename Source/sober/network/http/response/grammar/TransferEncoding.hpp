@@ -17,10 +17,10 @@ namespace grammar {
 // rfc7230, 3.3.1. Transfer-Encoding
 template <class Iterator>
 struct TransferEncoding: qi::grammar<Iterator, attribute::TransferEncoding()> {
-  using Base = qi::grammar<Iterator, attribute::TransferEncoding()>;
+  using Base = qi::grammar<Iterator, response::attribute::TransferEncoding()>;
 
   TransferEncoding(): Base(transfer_encoding) {
-    using TE = attribute::TransferEncoding;
+    using TE = response::attribute::TransferEncoding;
 
     // rfc7230, 4. Transfer Coding
     transfer_extension = *(qi::char_ - cr); // partial parse here, accept any
@@ -33,8 +33,8 @@ struct TransferEncoding: qi::grammar<Iterator, attribute::TransferEncoding()> {
   CR<Iterator> cr;
 
   qi::rule<Iterator, void()> transfer_extension;
-  qi::rule<Iterator, attribute::TransferEncoding()> transfer_coding;
-  qi::rule<Iterator, attribute::TransferEncoding()> transfer_encoding;
+  qi::rule<Iterator, response::attribute::TransferEncoding()> transfer_coding;
+  qi::rule<Iterator, response::attribute::TransferEncoding()> transfer_encoding;
 };
 
 } // namespace grammar

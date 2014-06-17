@@ -16,14 +16,14 @@ namespace grammar {
 // rfc7230, 3.1.2. Status Line
 template <class Iterator>
 struct StatusCode: qi::grammar<Iterator, attribute::StatusCode()> {
-  using Base = qi::grammar<Iterator, attribute::StatusCode()>;
+  using Base = qi::grammar<Iterator, response::attribute::StatusCode()>;
 
   StatusCode(): Base(status_code) {
     status_code %= uint_parser;
   }
 
   qi::uint_parser<unsigned, 10, 3, 3> uint_parser;
-  qi::rule<Iterator, attribute::StatusCode()> status_code;
+  qi::rule<Iterator, response::attribute::StatusCode()> status_code;
 };
 
 } // namespace grammar

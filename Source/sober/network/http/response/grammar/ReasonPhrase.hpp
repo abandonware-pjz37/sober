@@ -19,7 +19,7 @@ namespace grammar {
 // rfc7230, 3.1.2. Status Line
 template <class Iterator>
 struct ReasonPhrase: qi::grammar<Iterator, attribute::ReasonPhrase()> {
-  using Base = qi::grammar<Iterator, attribute::ReasonPhrase()>;
+  using Base = qi::grammar<Iterator, response::attribute::ReasonPhrase()>;
 
   ReasonPhrase(): Base(reason_phrase) {
     reason_phrase %= *(htab | sp | vchar | obs_text);
@@ -30,7 +30,7 @@ struct ReasonPhrase: qi::grammar<Iterator, attribute::ReasonPhrase()> {
   VCHAR<Iterator> vchar;
   ObsText<Iterator> obs_text;
 
-  qi::rule<Iterator, attribute::ReasonPhrase()> reason_phrase;
+  qi::rule<Iterator, response::attribute::ReasonPhrase()> reason_phrase;
 };
 
 } // namespace grammar

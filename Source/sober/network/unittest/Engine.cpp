@@ -171,7 +171,8 @@ TEST_F(Engine, retry_on_error) {
 }
 
 TEST_F(Engine, retry_with_timeout) {
-  const unsigned retry_number = 2;
+  enum { RETRY_NUMBER = 2 };
+
   using StatusCode = http::response::attribute::StatusCode;
 
   class RetryWithTimeout:
@@ -179,7 +180,7 @@ TEST_F(Engine, retry_with_timeout) {
       public http::delegate::Timeout {
    public:
     RetryWithTimeout():
-        http::delegate::Retry(retry_number, boost::posix_time::millisec(10)),
+        http::delegate::Retry(RETRY_NUMBER, boost::posix_time::millisec(10)),
         http::delegate::Timeout(boost::posix_time::seconds(10)) {
     }
   };
@@ -195,7 +196,7 @@ TEST_F(Engine, retry_with_timeout) {
 
   engine_.run();
 
-  ASSERT_EQ(stream_.statistic().get_restarted(), retry_number);
+  ASSERT_EQ(stream_.statistic().get_restarted(), RETRY_NUMBER);
 }
 
 TEST_F(Engine, default_delegate) {

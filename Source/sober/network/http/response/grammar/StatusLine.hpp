@@ -21,7 +21,7 @@ namespace grammar {
 // rfc7230, 3.1.2. Status-Line
 template <class Iterator>
 struct StatusLine: qi::grammar<Iterator, attribute::StatusLine()> {
-  using Base = qi::grammar<Iterator, attribute::StatusLine()>;
+  using Base = qi::grammar<Iterator, response::attribute::StatusLine()>;
 
   StatusLine(): Base(status_line) {
     status_line %=
@@ -35,7 +35,7 @@ struct StatusLine: qi::grammar<Iterator, attribute::StatusLine()> {
   SP<Iterator> sp;
   CRLF<Iterator> crlf;
 
-  qi::rule<Iterator, attribute::StatusLine()> status_line;
+  qi::rule<Iterator, response::attribute::StatusLine()> status_line;
 };
 
 } // namespace grammar

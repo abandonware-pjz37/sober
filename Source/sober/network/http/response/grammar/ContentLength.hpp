@@ -16,14 +16,14 @@ namespace grammar {
 // rfc7230, 3.3.2. Content-Length
 template <class Iterator>
 struct ContentLength: qi::grammar<Iterator, attribute::ContentLength()> {
-  using Base = qi::grammar<Iterator, attribute::ContentLength()>;
+  using Base = qi::grammar<Iterator, response::attribute::ContentLength()>;
 
   ContentLength(): Base(content_length) {
     content_length %= qi::lit("Content-Length: ") >> uint_parser;
   }
 
   qi::uint_parser<unsigned, 10, 1, -1> uint_parser;
-  qi::rule<Iterator, attribute::ContentLength()> content_length;
+  qi::rule<Iterator, response::attribute::ContentLength()> content_length;
 };
 
 } // namespace grammar

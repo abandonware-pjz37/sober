@@ -31,7 +31,7 @@ namespace grammar {
 // Header = HTTP-message without message-body
 template <class Iterator>
 struct Header: qi::grammar<Iterator, attribute::Header()> {
-  using Base = qi::grammar<Iterator, attribute::Header()>;
+  using Base = qi::grammar<Iterator, response::attribute::Header()>;
 
   Header(): Base(header) {
     namespace ph = boost::phoenix;
@@ -50,7 +50,7 @@ struct Header: qi::grammar<Iterator, attribute::Header()> {
     // rfc7230, 3.1. Start Line
     // start-line = status-line (for response)
     header = qi::eps[at_c<1>(_val) = 0] >>
-        qi::eps[at_c<2>(_val) = attribute::TransferEncoding::OTHER] >>
+        qi::eps[at_c<2>(_val) = response::attribute::TransferEncoding::OTHER] >>
         status_line[at_c<0>(_val) = _1] >>
         // Headers (simplified version) --
         +(
@@ -75,7 +75,7 @@ struct Header: qi::grammar<Iterator, attribute::Header()> {
 
   qi::rule<Iterator, void()> any_header;
 
-  qi::rule<Iterator, attribute::Header()> header;
+  qi::rule<Iterator, response::attribute::Header()> header;
 };
 
 } // namespace grammar

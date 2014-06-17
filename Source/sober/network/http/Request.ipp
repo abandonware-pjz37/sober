@@ -6,7 +6,10 @@
 
 #include <sober/network/http/Request.hpp>
 
-#include <boost/asio/write.hpp> // asio::async_write
+#include <leathers/push>
+#include <leathers/all>
+# include <boost/asio/write.hpp> // asio::async_write
+#include <leathers/pop>
 
 namespace sober {
 namespace network {

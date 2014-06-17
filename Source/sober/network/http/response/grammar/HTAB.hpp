@@ -16,13 +16,13 @@ namespace grammar {
 // rfc5234, B.1. Core Rules
 template <class Iterator>
 struct HTAB: qi::grammar<Iterator, attribute::HTAB()> {
-  using Base = qi::grammar<Iterator, attribute::HTAB()>;
+  using Base = qi::grammar<Iterator, response::attribute::HTAB()>;
 
   HTAB(): Base(htab) {
     htab %= qi::ascii::char_(0x09);
   }
 
-  qi::rule<Iterator, attribute::HTAB()> htab;
+  qi::rule<Iterator, response::attribute::HTAB()> htab;
 };
 
 } // namespace grammar

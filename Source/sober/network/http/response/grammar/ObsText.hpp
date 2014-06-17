@@ -15,13 +15,13 @@ namespace grammar {
 // rfc7230, 3.2.6. Field Value Components
 template <class Iterator>
 struct ObsText: qi::grammar<Iterator, attribute::ObsText()> {
-  using Base = qi::grammar<Iterator, attribute::ObsText()>;
+  using Base = qi::grammar<Iterator, response::attribute::ObsText()>;
 
   ObsText(): Base(obs_text) {
     obs_text %= qi::ascii::char_(0x80, 0xff);
   }
 
-  qi::rule<Iterator, attribute::ObsText()> obs_text;
+  qi::rule<Iterator, response::attribute::ObsText()> obs_text;
 };
 
 } // namespace grammar

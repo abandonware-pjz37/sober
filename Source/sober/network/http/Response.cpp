@@ -82,7 +82,7 @@ bool Response::on_read(std::size_t bytes_transferred) BOOST_NOEXCEPT {
   }
 
   assert(header_.transfer_encoding == Encoding::CHUNKED);
-  while (true) {
+  for (;;) {
     if (!chunk_size_done_) {
       const std::size_t len = parse(chunk_size_grammar_, chunk_size_);
       if (len == 0) {

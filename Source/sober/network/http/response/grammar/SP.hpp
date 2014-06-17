@@ -16,13 +16,13 @@ namespace grammar {
 // rfc5234, B.1. Core Rules
 template <class Iterator>
 struct SP: qi::grammar<Iterator, attribute::SP()> {
-  using Base = qi::grammar<Iterator, attribute::SP()>;
+  using Base = qi::grammar<Iterator, response::attribute::SP()>;
 
   SP(): Base(sp) {
     sp %= ' ';
   }
 
-  qi::rule<Iterator, attribute::SP()> sp;
+  qi::rule<Iterator, response::attribute::SP()> sp;
 };
 
 } // namespace grammar
