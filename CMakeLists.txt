@@ -55,31 +55,18 @@ sugar_generate_warning_flags(
     flags
     properties
     DISABLE
-    # compatibility-c++98
-    c++98-compat
-    c++98-compat-pedantic
-    # --
-
-    # special-members
-    assign-base-inaccessible
-    copy-ctor-could-not-be-generated
-    assign-could-not-be-generated
-    # --
-
+    # groups
+    compatibility-c++98
+    inline
+    special-members
     # others
-    padded
-    covered-switch-default
-    this-used-in-init
-    name-length-exceeded
     catch-semantic-changed
+    covered-switch-default
     inherits-via-dominance
-
-    # inline
-    unreferenced-inline
-    not-inlined
-    force-not-inlined
-    automatic-inline
-
+    name-length-exceeded
+    padded
+    this-used-in-init
+    #
     ENABLE ALL
     TREAT_AS_ERROR ALL
     CLEAR_GLOBAL
