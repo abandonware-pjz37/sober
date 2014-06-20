@@ -8,6 +8,7 @@ find_package(
 )
 find_package(GTest CONFIG REQUIRED PATHS @GTest_DIR@ NO_DEFAULT_PATH)
 find_package(JsonSpirit CONFIG REQUIRED PATHS @JsonSpirit_DIR@ NO_DEFAULT_PATH)
+find_package(Leathers CONFIG REQUIRED PATHS @Leathers_DIR@ NO_DEFAULT_PATH)
 
 @PACKAGE_INIT@
 
