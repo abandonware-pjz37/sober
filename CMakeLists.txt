@@ -25,6 +25,7 @@ find_package(CppNetlibUri CONFIG REQUIRED NO_CMAKE_BUILDS_PATH)
 find_package(GTest CONFIG REQUIRED NO_CMAKE_BUILDS_PATH)
 find_package(JsonSpirit CONFIG REQUIRED NO_CMAKE_BUILDS_PATH)
 find_package(Leathers CONFIG REQUIRED NO_CMAKE_BUILDS_PATH)
+find_package(Threads)
 
 ### - ###
 include("${SUGAR_ROOT}/cmake/Sugar")
@@ -133,6 +134,7 @@ endif()
 
 target_include_directories(sober SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
 target_link_libraries(sober PUBLIC ${Boost_LIBRARIES} network-uri json leathers)
+target_link_libraries(sober PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 
 ### Testing ###
 enable_testing()

@@ -173,8 +173,6 @@ TEST_F(Engine, retry_on_error) {
 TEST_F(Engine, retry_with_timeout) {
   enum { RETRY_NUMBER = 2 };
 
-  using StatusCode = http::response::attribute::StatusCode;
-
   class RetryWithTimeout:
       public http::delegate::Retry,
       public http::delegate::Timeout {

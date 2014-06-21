@@ -14,9 +14,9 @@
 namespace sober {
 namespace log {
 
-BOOST_LOG_ATTRIBUTE_KEYWORD(id, "sober.id", std::string);
-BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "sober.severity", Severity);
-BOOST_LOG_ATTRIBUTE_KEYWORD(this_, "sober.this", const void*);
+BOOST_LOG_ATTRIBUTE_KEYWORD(id, "sober.id", std::string)
+BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "sober.severity", Severity)
+BOOST_LOG_ATTRIBUTE_KEYWORD(this_, "sober.this", const void*)
 
 void base_formatter(
     const boost::log::record_view& rec, boost::log::formatting_ostream& stream
