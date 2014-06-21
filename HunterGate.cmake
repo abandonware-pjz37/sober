@@ -14,8 +14,8 @@
 
 cmake_minimum_required(VERSION 2.8.10)
 
-set(HUNTER_MINIMUM_VERSION "0.3.3")
-set(HUNTER_MINIMUM_VERSION_HASH 2c94192b1fedca076888ed83261ffd51c735219b)
+set(HUNTER_MINIMUM_VERSION "0.3.7")
+set(HUNTER_MINIMUM_VERSION_HASH 2e0fd774b5f03bd0789964aadbe0c90eb6ffff6b)
 
 # Set HUNTER_ROOT cmake variable to suitable value.
 # Info about variable can be found in HUNTER_ROOT_INFO.
@@ -226,6 +226,7 @@ if(NOT HUNTER_VERSION)
   message(
       FATAL_ERROR
       "Internal error: HUNTER_VERSION is not set in `version.cmake`"
+      " (${HUNTER_ROOT_INFO})"
   )
 endif()
 
@@ -240,6 +241,8 @@ if(HUNTER_VERSION VERSION_LESS HUNTER_MINIMUM_VERSION)
     message(
         FATAL_ERROR
         "Please update version manually or remove directory `${HUNTER_ROOT}`."
+        " Version read from file `${HUNTER_ROOT}/Source/cmake/version.cmake`."
+        " (${HUNTER_ROOT_INFO})"
     )
   endif()
 
@@ -247,6 +250,7 @@ if(HUNTER_VERSION VERSION_LESS HUNTER_MINIMUM_VERSION)
     message(
         FATAL_ERROR
         "Internal error: `installed.by.gate` and `.git`"
+        " (${HUNTER_ROOT_INFO})"
     )
   endif()
   # File `${HUNTER_ROOT}/installed.by.gate` exists, hence current version
