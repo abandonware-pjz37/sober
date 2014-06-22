@@ -70,7 +70,7 @@ void Delegate::on_start() {
 
 int main() {
   try {
-    const bool debug = sober::utils::always();
+    const bool debug = !sober::utils::always();
 
     if (debug) {
       sober::log::Logger::init_logs_for_testing(true, true);
