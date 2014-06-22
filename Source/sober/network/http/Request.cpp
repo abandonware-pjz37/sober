@@ -3,11 +3,8 @@
 
 #include <sober/network/http/Request.hpp>
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
-# include <network/uri/uri.hpp> // uri::encode_query
-#include <leathers/pop>
+#include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
+#include <network/uri/uri.hpp> // uri::encode_query
 
 #include <sober/log/Severity.hpp>
 #include <sober/network/http/request/Method.hpp>

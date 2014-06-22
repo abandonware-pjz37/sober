@@ -4,10 +4,7 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/concept_check.hpp> // ignore_unused_variable_warning
-#include <leathers/pop>
+#include <boost/concept_check.hpp> // ignore_unused_variable_warning
 
 #include <sober/config.hpp> // SOBER_DEBUG
 #include <sober/utils/always.hpp>

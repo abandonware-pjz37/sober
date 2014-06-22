@@ -3,11 +3,8 @@
 
 #include <sober/network/http/Stream.hpp>
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
-# include <network/uri.hpp>
-#include <leathers/pop>
+#include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
+#include <network/uri.hpp>
 
 #include <sober/log/Severity.hpp>
 #include <sober/network/Engine.ipp>

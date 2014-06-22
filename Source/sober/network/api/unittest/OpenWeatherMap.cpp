@@ -1,10 +1,7 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/concept_check.hpp> // ignore_unused_variable_warning
-#include <leathers/pop>
+#include <boost/concept_check.hpp> // ignore_unused_variable_warning
 
 #include <sober/network/Engine.hpp>
 #include <sober/network/api/OpenWeatherMap.hpp>
@@ -54,9 +51,6 @@ OpenWeatherMap::Delegate::~Delegate() {
 OpenWeatherMap::~OpenWeatherMap() {
 }
 
-#include <leathers/push>
-#include <leathers/global-constructors>
-
 TEST_F(OpenWeatherMap, good) {
   delegate_.async_get_city("Madrid");
   engine_.run();
@@ -83,8 +77,6 @@ TEST_F(OpenWeatherMap, simultaniously) {
   ASSERT_FALSE(api_A.attribute().temperature_human.empty());
   // Results of two request may be different :)
 }
-
-#include <leathers/pop>
 
 } // namespace unittest
 } // namespace api

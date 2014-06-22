@@ -3,13 +3,10 @@
 
 #include <sober/utils/Test.hpp>
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/log/sinks.hpp>
-# include <boost/log/utility/setup.hpp>
-# include <boost/utility/empty_deleter.hpp>
-# include <fstream> // std::ofstream
-#include <leathers/pop>
+#include <boost/log/sinks.hpp>
+#include <boost/log/utility/setup.hpp>
+#include <boost/utility/empty_deleter.hpp>
+#include <fstream> // std::ofstream
 
 #include <sober/log/attributes.hpp> // sober::log::formatter
 #include <sober/log/Logger.hpp>

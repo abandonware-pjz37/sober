@@ -3,16 +3,13 @@
 
 #include <sober/log/attributes.hpp>
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/date_time.hpp> // boost::posix_time
-# include <boost/log/attributes/current_thread_id.hpp>
-# include <boost/log/detail/default_attribute_names.hpp>
-# include <boost/log/detail/timestamp.hpp>
-# include <boost/log/expressions/formatters.hpp>
-# include <boost/log/expressions/message.hpp>
-# include <boost/log/utility/formatting_ostream.hpp>
-#include <leathers/pop>
+#include <boost/date_time.hpp> // boost::posix_time
+#include <boost/log/attributes/current_thread_id.hpp>
+#include <boost/log/detail/default_attribute_names.hpp>
+#include <boost/log/detail/timestamp.hpp>
+#include <boost/log/expressions/formatters.hpp>
+#include <boost/log/expressions/message.hpp>
+#include <boost/log/utility/formatting_ostream.hpp>
 
 namespace sober {
 namespace log {

@@ -3,11 +3,8 @@
 
 #include <sober/network/http/Response.hpp>
 
-#include <leathers/push>
-#include <leathers/all>
-# include <algorithm> // std::max
-# include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
-#include <leathers/pop>
+#include <algorithm> // std::max
+#include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
 
 #include <sober/log/Severity.hpp>
 #include <sober/network/http/Response.ipp>

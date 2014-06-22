@@ -4,10 +4,7 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/log/expressions/keyword.hpp> // BOOST_LOG_ATTRIBUTE_KEYWORD
-#include <leathers/pop>
+#include <boost/log/expressions/keyword.hpp> // BOOST_LOG_ATTRIBUTE_KEYWORD
 
 #include <sober/log/Severity.hpp>
 

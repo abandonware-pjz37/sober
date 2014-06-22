@@ -1,12 +1,9 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
-# include <chrono>
-# include <gtest/gtest.h> // TEST_F
-#include <leathers/pop>
+#include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
+#include <chrono>
+#include <gtest/gtest.h> // TEST_F
 
 #include <sober/network/Engine.hpp>
 #include <sober/network/http/Stream.hpp>
@@ -16,9 +13,6 @@
 #include <sober/network/http/delegate/String.hpp>
 #include <sober/utils/Test.hpp>
 #include <sober/utils/run_duration.hpp>
-
-#include <leathers/push>
-#include <leathers/global-constructors>
 
 namespace sober {
 namespace network {
@@ -427,5 +421,3 @@ TEST_F(Engine, redirect) {
 } // namespace unittest
 } // namespace network
 } // namespace sober
-
-#include <leathers/pop>

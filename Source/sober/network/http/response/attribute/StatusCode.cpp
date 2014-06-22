@@ -3,10 +3,7 @@
 
 #include <sober/network/http/response/attribute/StatusCode.hpp>
 
-#include <leathers/push>
-#include <leathers/all>
-# include <iostream> // std::ostream
-#include <leathers/pop>
+#include <iostream> // std::ostream
 
 namespace sober {
 namespace network {
@@ -264,12 +261,9 @@ std::ostream& operator<< (std::ostream& stream, StatusCode status_code) {
     case StatusCode::NETWORK_CONNECT_TIMEOUT_ERROR:
       stream << "Network connect timeout error";
       break;
-#include <leathers/push>
-#include <leathers/unreachable-code>
     default:
       stream << "!UNKNOWN!";
       break;
-#include <leathers/pop>
   }
   stream << "(" << static_cast<int>(status_code) << ")";
   return stream;

@@ -1,17 +1,11 @@
-#include <leathers/push>
-#include <leathers/all>
-# include <gtest/gtest.h> // TEST_F
-# include <thread> // std::this_thread
-#include <leathers/pop>
+#include <gtest/gtest.h> // TEST_F
+#include <thread> // std::this_thread
 
 #include <sober/network/Engine.hpp>
 #include <sober/network/http/Stream.hpp>
 #include <sober/network/http/delegate/Retry.hpp>
 #include <sober/network/http/delegate/String.hpp>
 #include <sober/utils/Test.hpp>
-
-#include <leathers/push>
-#include <leathers/global-constructors>
 
 namespace sober {
 namespace network {
@@ -88,5 +82,3 @@ TEST_F(Long, operation_timeout) {
 } // namespace unittest
 } // namespace network
 } // namespace sober
-
-#include <leathers/pop>

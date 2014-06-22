@@ -6,11 +6,8 @@
 
 #include <sober/network/http/ConnectManager.hpp>
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/asio/connect.hpp> // asio::async_connect
-# include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
-#include <leathers/pop>
+#include <boost/asio/connect.hpp> // asio::async_connect
+#include <boost/log/sources/record_ostream.hpp> // BOOST_LOG
 
 namespace sober {
 namespace network {

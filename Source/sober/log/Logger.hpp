@@ -4,11 +4,8 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/log/sources/logger.hpp>
-# include <sober/log/Severity.fpp>
-#include <leathers/pop>
+#include <boost/log/sources/logger.hpp>
+#include <sober/log/Severity.fpp>
 
 namespace sober {
 namespace log {

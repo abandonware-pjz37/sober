@@ -4,11 +4,8 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <leathers/push>
-#include <leathers/all>
-# include <cstdint> // uint64_t
-# include <boost/config.hpp> // BOOST_NOEXCEPT
-#include <leathers/pop>
+#include <cstdint> // uint64_t
+#include <boost/config.hpp> // BOOST_NOEXCEPT
 
 namespace sober {
 namespace network {

@@ -4,10 +4,7 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <leathers/push>
-#include <leathers/all>
-# include <network/uri.hpp>
-#include <leathers/pop>
+#include <network/uri.hpp>
 
 namespace sober {
 namespace network {

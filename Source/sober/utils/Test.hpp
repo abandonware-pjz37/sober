@@ -4,10 +4,7 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <leathers/push>
-#include <leathers/all>
-# include <gtest/gtest.h> // ::testing::Test
-#include <leathers/pop>
+#include <gtest/gtest.h> // ::testing::Test
 
 namespace sober {
 namespace utils {

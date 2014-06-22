@@ -3,17 +3,11 @@
 
 #include <sober/network/http/unittest/Response.fpp>
 
-#include <leathers/push>
-#include <leathers/all>
-# include <gtest/gtest.h> // TEST_F
-#include <leathers/pop>
+#include <gtest/gtest.h> // TEST_F
 
 #include <sober/network/http/Response.hpp>
 #include <sober/network/http/delegate/String.hpp>
 #include <sober/utils/Test.hpp>
-
-#include <leathers/push>
-#include <leathers/global-constructors>
 
 namespace sober {
 namespace network {
@@ -246,5 +240,3 @@ TEST_F(Response, no_location) {
 } // namespace http
 } // namespace network
 } // namespace sober
-
-#include <leathers/pop>

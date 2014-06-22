@@ -4,11 +4,8 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/asio/ip/tcp.hpp>
-# include <boost/asio/streambuf.hpp>
-#include <leathers/pop>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/streambuf.hpp>
 
 #include <sober/log/Logger.hpp>
 #include <sober/network/http/Stream.fpp>

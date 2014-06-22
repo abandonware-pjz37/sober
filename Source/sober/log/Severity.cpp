@@ -3,11 +3,8 @@
 
 #include <sober/log/Severity.hpp>
 
-#include <leathers/push>
-#include <leathers/all>
-# include <iostream> // std::ostream
-# include <stdexcept> // std::runtime_error
-#include <leathers/pop>
+#include <iostream> // std::ostream
+#include <stdexcept> // std::runtime_error
 
 namespace sober {
 namespace log {
@@ -23,11 +20,8 @@ std::ostream& operator<<(std::ostream& stream, Severity severity) {
     case Severity::ERROR:
       stream << "ERROR";
       break;
-#include <leathers/push>
-#include <leathers/unreachable-code>
     default:
       throw std::runtime_error("sober::log::Severity switch");
-#include <leathers/pop>
   }
   return stream;
 }

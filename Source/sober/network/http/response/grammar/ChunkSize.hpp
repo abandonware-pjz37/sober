@@ -6,10 +6,7 @@
 
 #undef nil // workaround for Obj-C++ (need for fusion::nil)
 
-#include <leathers/push>
-#include <leathers/all>
-# include <boost/spirit/home/qi.hpp>
-#include <leathers/pop>
+#include <boost/spirit/home/qi.hpp>
 
 #include <sober/network/http/response/attribute/ChunkSize.hpp>
 

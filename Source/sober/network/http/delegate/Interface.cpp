@@ -3,10 +3,7 @@
 
 #include <sober/network/http/delegate/Interface.hpp>
 
-#include <leathers/push>
-# include <leathers/all>
-# include <boost/concept_check.hpp> // ignore_unused_variable_warning
-#include <leathers/pop>
+#include <boost/concept_check.hpp> // ignore_unused_variable_warning
 
 namespace sober {
 namespace network {
