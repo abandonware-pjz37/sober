@@ -287,7 +287,11 @@ void Stream::read_some_handler(
     }
   }
 
-  const bool success = (status_code == StatusCode::OK);
+  const bool success =
+      (status_code == StatusCode::OK) ||
+      (status_code == StatusCode::CREATED)
+  ;
+
   if (!success) {
     BOOST_LOG(log_.info) << "Status code is not OK: " << status_code;
     if ((delegate_ != nullptr) && delegate_->restart_on_error(status_code)) {
