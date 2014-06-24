@@ -426,6 +426,42 @@ TEST_F(Engine, redirect) {
   );
 }
 
+TEST_F(Engine, created) {
+  class Delegate: public http::delegate::String {
+   public:
+    Delegate(): success_(false) {
+    }
+
+    virtual void on_success() override {
+      ASSERT_FALSE(success_);
+      success_ = true;
+    }
+
+    bool success() const {
+      return success_;
+    }
+
+   private:
+    bool success_;
+  };
+
+  Delegate delegate;
+  stream_.set_delegate(delegate);
+
+  stream_.set_endpoint(
+      "http://pass.rzd.ru/suggester?lang=ru&stationNamePart=gg"
+  );
+  stream_.async_start();
+
+  engine_.run();
+
+  ASSERT_TRUE(delegate.success());
+  ASSERT_EQ(
+      stream_.response.header().status_line.status_code,
+      http::response::attribute::StatusCode::CREATED
+  );
+}
+
 } // namespace unittest
 } // namespace network
 } // namespace sober
