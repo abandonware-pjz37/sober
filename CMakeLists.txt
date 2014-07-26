@@ -9,8 +9,14 @@ option(SOBER_BUILD_TESTS "Build unit tests" OFF)
 option(SOBER_BUILD_LONG_TESTS "Build long unit tests" OFF)
 option(SOBER_BUILD_EXAMPLES "Build examples" OFF)
 
+### Hunter snapshot that will be used ###
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.5.11.tar.gz"
+    SHA1 "3fb31d5a5d53fae93792866ef1486f83d15efe88"
+)
+
 ### Download dependencies ###
-include(HunterGate.cmake)
 hunter_add_package(Boost COMPONENTS thread system log)
 hunter_add_package(CppNetlibUri)
 hunter_add_package(GTest)
