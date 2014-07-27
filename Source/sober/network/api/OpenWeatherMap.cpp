@@ -15,15 +15,19 @@ OpenWeatherMap::OpenWeatherMap(http::Stream& stream): stream_(stream) {
   stream_.set_delegate(*this);
 }
 
-void OpenWeatherMap::async_get_city(const char* city) {
+void OpenWeatherMap::async_get_city(
+    const char* city, http::ExtraSuccessHandler handler
+) {
   stream_.request.clear_query();
   stream_.request.add_query("q", city);
   stream_.request.add_query("units", "metric");
-  stream_.async_start();
+  stream_.async_start(handler);
 }
 
-void OpenWeatherMap::async_get_city(const std::string& city) {
-  async_get_city(city.c_str());
+void OpenWeatherMap::async_get_city(
+    const std::string& city, http::ExtraSuccessHandler handler
+) {
+  async_get_city(city.c_str(), handler);
 }
 
 void OpenWeatherMap::Attribute::fill(const ciere::json::value& value) {

@@ -4,6 +4,7 @@
 // Copyright (c) 2014, Ruslan Baratov
 // All rights reserved.
 
+#include <sober/network/http/ExtraSuccessHandler.hpp>
 #include <sober/network/http/Stream.fpp>
 #include <sober/network/http/delegate/Json.hpp>
 
@@ -32,8 +33,12 @@ class OpenWeatherMap : public http::delegate::Json {
     std::ostringstream str_;
   };
 
-  void async_get_city(const char* city);
-  void async_get_city(const std::string& city);
+  void async_get_city(
+      const char* city, http::ExtraSuccessHandler handler = nullptr
+  );
+  void async_get_city(
+      const std::string& city, http::ExtraSuccessHandler handler = nullptr
+  );
 
   virtual void body_start() BOOST_NOEXCEPT override;
   virtual void on_success() override;
