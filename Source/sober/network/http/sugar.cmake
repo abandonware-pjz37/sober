@@ -20,6 +20,7 @@ sugar_files(
     ConnectManager.cpp
     ConnectManager.hpp
     ConnectManager.ipp
+    ExtraSuccessHandler.hpp
     Request.cpp
     Request.fpp
     Request.hpp
