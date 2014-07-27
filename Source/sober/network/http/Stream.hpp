@@ -14,10 +14,11 @@
 #include <sober/log/Logger.hpp>
 #include <sober/network/Engine.fpp>
 #include <sober/network/http/ConnectManager.hpp>
-#include <sober/network/http/Statistic.hpp>
-#include <sober/network/http/delegate/Interface.fpp>
+#include <sober/network/http/ExtraSuccessHandler.hpp>
 #include <sober/network/http/Request.hpp>
 #include <sober/network/http/Response.hpp>
+#include <sober/network/http/Statistic.hpp>
+#include <sober/network/http/delegate/Interface.fpp>
 
 namespace network {
 class uri;
@@ -84,7 +85,7 @@ class Stream {
   /**
     * @brief Add asynchorous operation to @c Engine
     */
-  void async_start();
+  void async_start(ExtraSuccessHandler handler = nullptr);
 
   /**
     * @brief Cancel current operation
@@ -263,6 +264,7 @@ class Stream {
   ReadSomeHandler read_some_handler_;
   RestartHandler restart_handler_;
   WatchdogHandler watchdog_handler_;
+  ExtraSuccessHandler extra_success_handler_;
 
   boost::asio::deadline_timer restart_timer_;
   boost::asio::deadline_timer watchdog_timer_;

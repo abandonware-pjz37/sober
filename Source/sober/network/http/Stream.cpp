@@ -69,8 +69,9 @@ void Stream::set_delegate(delegate::Interface& delegate) {
   response.set_delegate(delegate);
 }
 
-void Stream::async_start() {
+void Stream::async_start(ExtraSuccessHandler handler) {
   BOOST_LOG(log_.debug) << "async start";
+  extra_success_handler_ = std::move(handler);
 
   if (delegate_ != nullptr) {
     delegate_->on_start();
@@ -309,6 +310,9 @@ void Stream::read_some_handler(
 
   if (delegate_ != nullptr && success) {
     delegate_->on_success();
+    if (extra_success_handler_) {
+      extra_success_handler_();
+    }
   }
 }
 
