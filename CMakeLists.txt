@@ -1,8 +1,7 @@
-# Copyright (c) 2014, Ruslan Baratov
+# Copyright (c) 2014-2015, Ruslan Baratov
 # All rights reserved.
 
 cmake_minimum_required(VERSION 3.0)
-project(Sober)
 
 ### Build Options ###
 option(SOBER_BUILD_TESTS "Build unit tests" OFF)
@@ -10,12 +9,20 @@ option(SOBER_BUILD_LONG_TESTS "Build long unit tests" OFF)
 option(SOBER_BUILD_EXAMPLES "Build examples" OFF)
 
 ### Download dependencies ###
-include(HunterGate.cmake)
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.8.1.tar.gz"
+    SHA1 "a9bd96ab113f3af870b13cd05cf4e75b8848cf4a"
+)
+
+project(Sober)
+
 hunter_add_package(Boost COMPONENTS thread system log)
 hunter_add_package(CppNetlibUri)
 hunter_add_package(GTest)
 hunter_add_package(JsonSpirit)
 hunter_add_package(Sugar)
+hunter_add_package(Leathers)
 
 ### Find dependencies ###
 set(Boost_USE_STATIC_LIBS ON)
