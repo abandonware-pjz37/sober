@@ -33,10 +33,10 @@ install:
     # -- end
 
 env:
-    - BUILD_TYPE="Debug" TOOLCHAIN="clang_libstdcxx"
-    - BUILD_TYPE="Release" TOOLCHAIN="clang_libstdcxx"
-    - BUILD_TYPE="Debug" TOOLCHAIN="gcc48"
-    - BUILD_TYPE="Release" TOOLCHAIN="gcc48"
+    - BUILD_TYPE="Debug" TOOLCHAIN="clang-libstdcxx"
+    - BUILD_TYPE="Release" TOOLCHAIN="clang-libstdcxx"
+    - BUILD_TYPE="Debug" TOOLCHAIN="gcc-4-8"
+    - BUILD_TYPE="Release" TOOLCHAIN="gcc-4-8"
 
 script:
     - build.py --toolchain ${TOOLCHAIN} --verbose --test --config ${BUILD_TYPE} --fwd SOBER_RUN_LONG_TESTS=ON HUNTER_RUN_INSTALL=ON
