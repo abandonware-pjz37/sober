@@ -15,6 +15,7 @@ project(Sober)
 option(SOBER_BUILD_TESTS "Build unit tests" OFF)
 option(SOBER_BUILD_LONG_TESTS "Build long unit tests" OFF)
 option(SOBER_BUILD_EXAMPLES "Build examples" OFF)
+option(SOBER_RELAX_WARNINGS "Do not treat warnings as errors" OFF)
 
 ### Download dependencies ###
 hunter_add_package(Boost COMPONENTS thread system log)
@@ -57,6 +58,12 @@ sugar_groups_generate(${SOBER_LONG_UT_SOURCES})
 
 ### Targets ###
 
+if(SOBER_RELAX_WARNINGS)
+  set(treat_as_error "")
+else()
+  set(treat_as_error TREAT_AS_ERROR ALL)
+endif()
+
 sugar_generate_warning_flags(
     flags
     properties
@@ -74,7 +81,7 @@ sugar_generate_warning_flags(
     this-used-in-init
     #
     ENABLE ALL
-    TREAT_AS_ERROR ALL
+    ${treat_as_error}
     CLEAR_GLOBAL
 )
 
