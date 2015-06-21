@@ -6,6 +6,7 @@
 #include <leathers/push>
 #include <leathers/all>
 # include <iostream> // std::ostream
+# include <stdexcept> // std::runtime_error
 #include <leathers/pop>
 
 namespace sober {
