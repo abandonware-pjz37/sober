@@ -156,7 +156,7 @@ set(LIBR_DEST "lib")
 include(CMakePackageConfigHelpers)
 set(sober_config "${CMAKE_CURRENT_BINARY_DIR}/SoberConfig.cmake")
 configure_package_config_file(
-    "SoberConfig.cmake.in"
+    "cmake/SoberConfig.cmake.in"
     ${sober_config}
     INSTALL_DESTINATION ${CONF_DEST}
     PATH_VARS CONF_DEST
